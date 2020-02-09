@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
+import subprocess
+import webbrowser
+from threading import Timer
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import webbrowser
-from threading import Timer
-import subprocess
-import time
 
-port = 5000 # or simply open on the default `8050` port
+port = 5000  # or simply open on the default `8050` port
+
 
 def open_browser():
     webbrowser.open_new("http://localhost:{}".format(port))
-    #time.sleep(5)
+    # time.sleep(5)
     subprocess.call(["xdotool", "key", "F11"])
+
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
