@@ -1,10 +1,10 @@
 import PySimpleGUI as sg
 
 sg.theme('DarkAmber')  # Add a touch of color
-LARGEBUTTONSIZE = (24, 12)
-SMALLBUTTONSIZE = (24,1)
-WINDOWWIDTH = 320
-WINDOWHEIGHT = 240
+LARGEBUTTONSIZE = (16, 6)
+SMALLBUTTONSIZE = (16,2)
+WINDOWWIDTH = 500
+WINDOWHEIGHT = 320
 
 # All the stuff inside your window.
 layout = [[sg.Text(size=SMALLBUTTONSIZE),sg.Text('Who drives?',justification='center'),sg.Text(size=SMALLBUTTONSIZE)],
