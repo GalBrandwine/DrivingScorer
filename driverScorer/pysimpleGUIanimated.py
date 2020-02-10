@@ -1,10 +1,10 @@
-from tkinter import *
+import tkinter as Tk
 from random import randint
+
 import PySimpleGUI as sg
+import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, FigureCanvasAgg
 from matplotlib.figure import Figure
-import matplotlib.backends.tkagg as tkagg
-import tkinter as Tk
 
 fig = Figure()
 
@@ -12,6 +12,7 @@ ax = fig.add_subplot(111)
 ax.set_xlabel("X axis")
 ax.set_ylabel("Y axis")
 ax.grid()
+
 
 layout = [[sg.Text('Animated Matplotlib', size=(40, 1), justification='center', font='Helvetica 20')],
           [sg.Canvas(size=(640, 480), key='canvas')],
@@ -31,7 +32,7 @@ canvas = canvas_elem.TKCanvas
 dpts = [randint(0, 10) for x in range(10000)]
 # Our event loop
 for i in range(len(dpts)):
-    event, values = window.read(timeout=20)
+    event, values = window.read(timeout=1)
     if event == 'Exit' or event is None:
         exit(69)
 
