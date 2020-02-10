@@ -16,6 +16,11 @@ while True:
     event, values = window.read()
     if event in (None, 'Cancel', 'Exit'):  # if user closes window or clicks cancel
         break
-    print('You entered ', values[0])
+    if event == "rivka":
+        print(event)
+    if event == "gal":
+        print(event)
+    if event == "other":
+        print(event)
 
 window.close()
