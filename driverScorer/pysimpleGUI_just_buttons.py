@@ -8,9 +8,9 @@ WINDOWHEIGHT = 320
 
 # All the stuff inside your window.
 layout = [[sg.Text(size=SMALLBUTTONSIZE),sg.Text('Who drives?',justification='center'),sg.Text(size=SMALLBUTTONSIZE)],
-            [sg.Button('Gal', key="gal", size=LARGEBUTTONSIZE),
-            sg.Button('Rivka', key='rivka',size=LARGEBUTTONSIZE),
-            sg.Button('Other', key='other',size=LARGEBUTTONSIZE)]
+            [sg.Button('Gal', key="gal", size=LARGEBUTTONSIZE,button_color=('black','light sky blue')),
+            sg.Button('Rivka', key='rivka',size=LARGEBUTTONSIZE,button_color=('black','spring green')),
+            sg.Button('Other', key='other',size=LARGEBUTTONSIZE,button_color=('black','light pink'))]
           ]
 
 # Create the Window
