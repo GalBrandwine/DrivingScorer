@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 
 import driverScorer.driver_scoorer as drvr_scrr
 
-LOGTARGET = "CONSOLE"
+LOGTARGET = "CSV"
 driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=True)
 
 
@@ -10,6 +10,7 @@ def start_recording(label: str):
     driver_scorer.start(label)
 
 
+# GUI section
 sg.theme('DarkAmber')  # Add a touch of color
 LARGEBUTTONSIZE = (16, 6)
 SMALLBUTTONSIZE = (16, 2)
@@ -30,6 +31,20 @@ layout = [
 
 # Create the Window
 window = sg.Window('DrivingScorer', layout, size=(WINDOWWIDTH, WINDOWHEIGHT))
+
+
+def handle_start_recording(event):
+    global window
+    recording_window = [
+        [sg.Slider(range=(0x1000, 0x10000), orientation='h', size=(34, 20))],
+        [sg.Ok(), sg.Cancel()]
+    ]
+
+    window.close()
+    window = sg.Window('Recording', recording_window, size=(WINDOWWIDTH, WINDOWHEIGHT))
+    start_recording(event)
+
+
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
     event, values = window.read()
@@ -37,17 +52,6 @@ while True:
         driver_scorer.stop()
         break
 
-    if event == "rivka":
-        start_recording(event)
-        driver_scorer.logger.log_info(event)
-    if event == "gal":
-        start_recording(event)
-        driver_scorer.logger.log_info(event)
-    if event == "other":
-        start_recording(event)
-        driver_scorer.logger.log_info(event)
-
-    # Update the "output" text element to be the value of "input" element
-    # window['-OUTPUT-'].update(values['-IN-'])
+    handle_start_recording(event)
 
 window.close()
