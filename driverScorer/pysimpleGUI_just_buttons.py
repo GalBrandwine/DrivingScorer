@@ -1,5 +1,15 @@
 import PySimpleGUI as sg
 
+import driverScorer.driver_scoorer as drvr_scrr
+
+LOGTARGET = "CONSOLE"
+driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=True)
+
+
+def start_recording(label: str):
+    driver_scorer.start(label)
+
+
 sg.theme('DarkAmber')  # Add a touch of color
 LARGEBUTTONSIZE = (16, 6)
 SMALLBUTTONSIZE = (16, 2)
@@ -24,13 +34,18 @@ window = sg.Window('DrivingScorer', layout, size=(WINDOWWIDTH, WINDOWHEIGHT))
 while True:
     event, values = window.read()
     if event in (None, 'Cancel', 'Exit'):  # if user closes window or clicks cancel
+        driver_scorer.stop()
         break
+
     if event == "rivka":
-        print(event)
+        start_recording(event)
+        driver_scorer.logger.log_info(event)
     if event == "gal":
-        print(event)
+        start_recording(event)
+        driver_scorer.logger.log_info(event)
     if event == "other":
-        print(event)
+        start_recording(event)
+        driver_scorer.logger.log_info(event)
 
     # Update the "output" text element to be the value of "input" element
     # window['-OUTPUT-'].update(values['-IN-'])
