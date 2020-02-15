@@ -16,8 +16,10 @@ class DrivingScorer:
         # self.logger.log_info("Thread %s starting", label)
         while self._keep_running:
             data = self._sensor.get_data()
-            self.logger.log_info("%d, %d, %d,%s", data[0], data[1],
-                                 data[2],label)  # format: data[0],data[1],data[2],label
+
+
+            self.logger.log_info("%d, %d, %d,%s", data[0], data[1], data[2], label)  # format: data[0],data[1],data[2],label
+
 
     def start(self, label):
         self._threaded_data_recorder = threading.Thread(target=self._start_recording_data, args=(label,))
