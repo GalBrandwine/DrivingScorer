@@ -1,4 +1,7 @@
 import PySimpleGUI as sg
+import matplotlib.backends.tkagg as tkagg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, FigureCanvasAgg
+from matplotlib.figure import Figure
 
 import driverScorer.driver_scoorer as drvr_scrr
 
@@ -17,6 +20,13 @@ LARGEBUTTONSIZE = (16, 6)
 SMALLBUTTONSIZE = (16, 2)
 WINDOWWIDTH = 500
 WINDOWHEIGHT = 320
+
+fig = Figure()
+
+ax = fig.add_subplot(111)
+ax.set_xlabel("X axis")
+ax.set_ylabel("Y axis")
+ax.grid()
 
 # All the stuff inside your window.
 column1 = [
@@ -37,13 +47,42 @@ window = sg.Window('DrivingScorer', layout, size=(WINDOWWIDTH, WINDOWHEIGHT))
 def handle_start_recording(event):
     global window
     recording_window = [
-        [sg.Slider(range=(0x1000, 0x10000), orientation='h', size=(34, 20))],
+        [sg.Canvas(size=(WINDOWWIDTH - 10, WINDOWHEIGHT - 10), key='canvas')],
         [sg.Ok(), sg.Cancel()]
     ]
 
     window.close()
+
     window = sg.Window('Recording', recording_window, size=(WINDOWWIDTH, WINDOWHEIGHT))
+    window.Finalize()  # needed to access the canvas element prior to reading the window
+
     start_recording(event)
+
+    canvas_elem = window['canvas']
+
+    graph = FigureCanvasTkAgg(fig, master=canvas_elem.TKCanvas)
+    canvas = canvas_elem.TKCanvas
+
+    while (True):
+        event, values = window.read(timeout=1)
+        if event == 'Exit' or event is None:
+            exit(69)
+
+        ax.cla()
+        ax.grid()
+
+        ax.plot(range(20), driver_scorer.get_deltas(), color='purple')
+        graph.draw()
+        figure_x, figure_y, figure_w, figure_h = fig.bbox.bounds
+        figure_w, figure_h = int(figure_w), int(figure_h)
+        photo = Tk.PhotoImage(master=canvas, width=figure_w, height=figure_h)
+
+        canvas.create_image(640 / 2, 480 / 2, image=photo)
+
+        figure_canvas_agg = FigureCanvasAgg(fig)
+        figure_canvas_agg.draw()
+
+        tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
 
 
 # Event Loop to process "events" and get the "values" of the inputs
