@@ -10,6 +10,7 @@ from utils.logger import Logger
 class DrivingScorer:
 
     def __init__(self, logging_target: str, is_mock=False):
+        self._MAXNUMBEROFSCORES = 100
         self._sensor = imu.Imu(is_mock)
         self.logger = Logger(logging_target)
         self._keep_running: bool = True
@@ -20,7 +21,7 @@ class DrivingScorer:
         self._current_driving_score: float = 0
         self._current_acceleration_deltas: np.array([]) = np.zeros(3)
         self._previous_sensor_data: np.array([]) = np.zeros(3)
-        self._driving_scores_arr: np.array([]) = np.array([])
+        self._driving_scores_arr: np.array([]) = np.zeros(self._MAXNUMBEROFSCORES)
 
     def _proccess_data(self, label):
         self._keep_running = True
@@ -60,12 +61,13 @@ class DrivingScorer:
         """
         Naive way for scoring a drive.
         :param data: Updated sensor data.
-        :return: float current scoring
+        :return: None
         """
+
         current_score = np.linalg.norm(data - self._previous_sensor_data)
         self._current_driving_score = current_score
-        self._driving_scores_arr = np.append(self._driving_scores_arr,
-                                             current_score)  # TODO: change this append to a cyclic array element addition in fixed size.
+
+        self._driving_scores_arr = np.append(self._driving_scores_arr,current_score) #TODO: use np.roling
         self._current_acceleration_deltas = np.subtract(data, self._previous_sensor_data)
         self._previous_sensor_data = data
 
