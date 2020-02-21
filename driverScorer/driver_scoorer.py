@@ -18,7 +18,6 @@ class DrivingScorer:
         self._data_lock = Lock()
 
         self._current_driving_score: float = 0
-        # self._average_driver_score: float = 0
         self._current_acceleration_deltas: np.array([]) = np.zeros(3)
         self._previous_sensor_data: np.array([]) = np.zeros(3)
         self._driving_scores_arr: np.array([]) = np.array([])
@@ -53,6 +52,10 @@ class DrivingScorer:
         with self._data_lock:
             return self._current_acceleration_deltas
 
+    def get_score_arr(self) -> np.array([]):
+        with self._data_lock:
+            return self._driving_scores_arr
+
     def _score_drive(self, data: np.array([])) -> None:
         """
         Naive way for scoring a drive.
@@ -61,7 +64,8 @@ class DrivingScorer:
         """
         current_score = np.linalg.norm(data - self._previous_sensor_data)
         self._current_driving_score = current_score
-        self._driving_scores_arr = np.append(self._driving_scores_arr, current_score)
+        self._driving_scores_arr = np.append(self._driving_scores_arr,
+                                             current_score)  # TODO: change this append to a cyclic array element addition in fixed size.
         self._current_acceleration_deltas = np.subtract(data, self._previous_sensor_data)
         self._previous_sensor_data = data
 

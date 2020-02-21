@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 
 import driverScorer.driver_scoorer as drvr_scrr
 
+SLIDINGWINDOWSIZE = 50
 LOGTARGET = "CSV"
 # LOGTARGET = "CONSOLE"
 driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=True)
@@ -48,7 +49,7 @@ window = sg.Window('DrivingScorer', layout, size=(WINDOWWIDTH, WINDOWHEIGHT))
 
 def handle_start_recording(event):
     global window
-    global start_graphing
+    global SLIDINGWINDOWSIZE
     recording_window = [
         [sg.Canvas(size=(WINDOWWIDTH - 20, WINDOWHEIGHT - 40), key='canvas')],
         [sg.Cancel()]
@@ -65,16 +66,21 @@ def handle_start_recording(event):
 
     graph = FigureCanvasTkAgg(fig, master=canvas_elem.TKCanvas)
     canvas = canvas_elem.TKCanvas
+    begin_index = 0
 
     while (True):
         event, values = window.read(timeout=1)
         if event == 'Exit' or event == 'Cancel' or event is None:
             return
 
+
         ax.cla()
         ax.grid()
-
-        ax.plot(range(len(driver_scorer.get_deltas())), driver_scorer.get_deltas(), color='purple')
+        current_score_arr = driver_scorer.get_score_arr()[begin_index: begin_index + SLIDINGWINDOWSIZE]
+        if len(current_score_arr) is 0:
+            print("stop here")
+        begin_index = begin_index + SLIDINGWINDOWSIZE
+        ax.plot(range(len(current_score_arr)), current_score_arr, color='purple')
         graph.draw()
         figure_x, figure_y, figure_w, figure_h = fig.bbox.bounds
         figure_w, figure_h = int(figure_w), int(figure_h)
