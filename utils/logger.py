@@ -8,12 +8,9 @@ class Logger:
         self.logger = logging.getLogger('DrivingScorer')
         self.logger.setLevel(logging.INFO)
 
-        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         formatter = logging.Formatter(fmt='%(asctime)s.%(msecs)03d,%(message)s', datefmt='%Y-%m-%d,%H:%M:%S')
 
         if logging_target == "CONSOLE":
-            # logging.basicConfig(format=formatter,level=logging.INFO,
-            #                     datefmt='%d_%m_%Y_%H_%M_%S')  # datefmt="%H:%M:%S"
 
             # create console handler with a higher log level
             ch = logging.StreamHandler()
@@ -35,14 +32,6 @@ class Logger:
             fh.setLevel(logging.INFO)
             fh.setFormatter(formatter)
             self.logger.addHandler(fh)
-            # try:
-            #
-            #     logging.basicConfig(format=formatter,filename=filename,
-            #                         level=logging.INFO)
-            # except FileNotFoundError as e:
-            #     os.mkdir(filename)
-            #     logging.basicConfig(format=formatter,filename=filename,
-            #                         level=logging.INFO)
 
         else:
             raise NotImplemented("Logger::no such logging_target %s", logging_target)

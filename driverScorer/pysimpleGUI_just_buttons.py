@@ -1,3 +1,5 @@
+import tkinter as Tk
+
 import PySimpleGUI as sg
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, FigureCanvasAgg
@@ -21,7 +23,7 @@ SMALLBUTTONSIZE = (16, 2)
 WINDOWWIDTH = 500
 WINDOWHEIGHT = 320
 
-fig = Figure()
+fig = Figure(figsize=(10, 6), dpi=45)
 
 ax = fig.add_subplot(111)
 ax.set_xlabel("X axis")
@@ -46,9 +48,10 @@ window = sg.Window('DrivingScorer', layout, size=(WINDOWWIDTH, WINDOWHEIGHT))
 
 def handle_start_recording(event):
     global window
+    global start_graphing
     recording_window = [
-        [sg.Canvas(size=(WINDOWWIDTH - 10, WINDOWHEIGHT - 10), key='canvas')],
-        [sg.Ok(), sg.Cancel()]
+        [sg.Canvas(size=(WINDOWWIDTH - 20, WINDOWHEIGHT - 40), key='canvas')],
+        [sg.Cancel()]
     ]
 
     window.close()
@@ -65,19 +68,19 @@ def handle_start_recording(event):
 
     while (True):
         event, values = window.read(timeout=1)
-        if event == 'Exit' or event is None:
-            exit(69)
+        if event == 'Exit' or event == 'Cancel' or event is None:
+            return
 
         ax.cla()
         ax.grid()
 
-        ax.plot(range(20), driver_scorer.get_deltas(), color='purple')
+        ax.plot(range(len(driver_scorer.get_deltas())), driver_scorer.get_deltas(), color='purple')
         graph.draw()
         figure_x, figure_y, figure_w, figure_h = fig.bbox.bounds
         figure_w, figure_h = int(figure_w), int(figure_h)
         photo = Tk.PhotoImage(master=canvas, width=figure_w, height=figure_h)
 
-        canvas.create_image(640 / 2, 480 / 2, image=photo)
+        canvas.create_image(WINDOWWIDTH / 2, WINDOWHEIGHT / 2, image=photo)
 
         figure_canvas_agg = FigureCanvasAgg(fig)
         figure_canvas_agg.draw()
@@ -89,9 +92,9 @@ def handle_start_recording(event):
 while True:
     event, values = window.read()
     if event in (None, 'Cancel', 'Exit'):  # if user closes window or clicks cancel
-        driver_scorer.stop()
         break
 
     handle_start_recording(event)
 
+driver_scorer.stop()
 window.close()

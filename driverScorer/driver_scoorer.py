@@ -23,19 +23,22 @@ class DrivingScorer:
         self._previous_sensor_data: np.array([]) = np.zeros(3)
         self._driving_scores_arr: np.array([]) = np.array([])
 
-    def _start_recording_data(self, label):
+    def _proccess_data(self, label):
         self._keep_running = True
-        # self.logger.log_info("Thread %s starting", label)
+
         while self._keep_running:
             data = self._sensor.get_data()
             with self._data_lock:
+                # Critical section
                 self._score_drive(data)
+                self._record_data(data, label)
 
-            self.logger.log_info("%d, %d, %d,%s", data[0], data[1], data[2],
-                                 label)  # format: data[0],data[1],data[2],label
+    def _record_data(self, data: np.array([]), label: str):
+        self.logger.log_info("%f, %f, %f,%s", data[0], data[1], data[2],
+                             label)  # format: data[0],data[1],data[2],label
 
     def start(self, label) -> None:
-        self._threaded_data_recorder = Thread(target=self._start_recording_data, args=(label,))
+        self._threaded_data_recorder = Thread(target=self._proccess_data, args=(label,))
         self._threaded_data_recorder.start()
 
     def stop(self) -> None:
