@@ -55,29 +55,24 @@ def handle_start_recording(event):
 
     window.close()
 
-    window = sg.Window('Recording', recording_window, size=(WINDOWWIDTH, WINDOWHEIGHT))
+    window = sg.Window('Recording data, higher is better.', recording_window, size=(WINDOWWIDTH, WINDOWHEIGHT))
     window.Finalize()  # needed to access the canvas element prior to reading the window
 
-    start_recording(event)
+    start_recording(event)  # Start driving_scorer
 
     canvas_elem = window['canvas']
-
     graph = FigureCanvasTkAgg(fig, master=canvas_elem.TKCanvas)
     canvas = canvas_elem.TKCanvas
-    begin_index = 0
 
     while (True):
         event, values = window.read(timeout=1)
+
         if event == 'Exit' or event == 'Cancel' or event is None:
             return
-
 
         ax.cla()
         ax.grid()
         current_score_arr = driver_scorer.get_score_arr()
-
-        if len(current_score_arr) is 0:
-            print("stop here")
 
         ax.plot(range(len(current_score_arr)), current_score_arr, color='purple')
         graph.draw()
