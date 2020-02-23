@@ -26,8 +26,8 @@ WINDOWHEIGHT = 320
 fig = Figure(figsize=(10, 6), dpi=45)
 
 ax = fig.add_subplot(111)
-ax.set_xlabel("X axis")
-ax.set_ylabel("Y axis")
+ax.set_xlabel("Time")
+ax.set_ylabel("Grade")
 ax.grid()
 
 # All the stuff inside your window.
@@ -50,7 +50,8 @@ def handle_start_recording(event):
     global window
     recording_window = [
         [sg.Canvas(size=(WINDOWWIDTH - 20, WINDOWHEIGHT - 40), key='canvas')],
-        [sg.Cancel()]
+        [sg.Cancel(), sg.Text('CURRENT SCORE: '), sg.Text('before', key='-CURRENT_SCORE-'),
+         sg.Text('AVERAGE SCORE: '), sg.Text('before', key='-AVERAGE_SCORE-')]
     ]
 
     window.close()
@@ -87,14 +88,16 @@ def handle_start_recording(event):
 
         tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
 
+        current_score, average_score = driver_scorer.get_scoring()
+        print(current_score, average_score)
+        window['-CURRENT_SCORE-'].update(current_score)
+        window['-AVERAGE_SCORE-'].update(average_score)
+
 
 # Event Loop to process "events" and get the "values" of the inputs
-while True:
-    event, values = window.read()
-    if event in (None, 'Cancel', 'Exit'):  # if user closes window or clicks cancel
-        break
+event, values = window.read()
+handle_start_recording(event)
 
-    handle_start_recording(event)
 
 driver_scorer.stop()
 window.close()

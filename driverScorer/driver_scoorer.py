@@ -19,6 +19,9 @@ class DrivingScorer:
 
         self._data_lock = Lock()
 
+        self._score_sum: float = 0
+        self._average_score: float = 1.0
+        self._number_of_scores: float = 1.0
         self._current_driving_score: float = 0
         self._previous_normalized_sensor_data: np.array([]) = np.random.uniform(0, 1, 3)
         self._driving_scores_arr: np.array([]) = np.zeros(self._MAXNUMBEROFSCORES)
@@ -50,9 +53,9 @@ class DrivingScorer:
         self._keep_running = False
         self._threaded_data_recorder.join()
 
-    def get_current_score(self) -> float:
+    def get_scoring(self) -> (float, float):
         with self._data_lock:
-            return self._current_driving_score
+            return self._current_driving_score, self._average_score
 
     def get_score_arr(self) -> np.array([]):
         with self._data_lock:
@@ -90,6 +93,7 @@ class DrivingScorer:
         normalized_current_data_between_0_to_1 = np.linalg.norm(
             normalized_current_data - self._previous_normalized_sensor_data)
         self._previous_normalized_sensor_data = normalized_current_data
+
         return normalized_current_data_between_0_to_1
 
     def _update_scores_arr(self, current_normalized_datascore_between_0_to_1):
@@ -102,6 +106,14 @@ class DrivingScorer:
         self._driving_scores_arr = np.roll(self._driving_scores_arr, -1)  # Shift left by one.
         self._driving_scores_arr[
             self._MAXNUMBEROFSCORES - 1] = 1 - current_normalized_datascore_between_0_to_1  # Add to the end.
+        self._update_current_score(current_normalized_datascore_between_0_to_1)
+
+    def _update_current_score(self, current_normalized_score) -> None:
+        self._current_driving_score = 1 - current_normalized_score
+        self._score_sum = self._score_sum + self._current_driving_score
+        self._number_of_scores = self._number_of_scores + 1
+
+        self._average_score = self._score_sum / self._number_of_scores
 
 
 if __name__ == "__main__":
