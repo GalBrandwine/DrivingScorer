@@ -147,14 +147,7 @@ AK8963_ST2 = 0x09
 AK8963_CNTL = 0x0A
 mag_sens = 4900.0  # magnetometer sensitivity: 4800 uT
 
-if __name__ == "__main__":
-    # start I2C driver
-    bus = smbus.SMBus(1)  # start comm with i2c bus
-    gyro_sens, accel_sens = MPU6050_start()  # instantiate gyro/accel
-
-    print(gyro_sens, accel_sens)
-    time.sleep(1)
-    while(True):
-        print(mpu6050_conv())
-
-    # AK8963_start()  # instantiate magnetometer
+# start I2C driver
+bus = smbus.SMBus(1)  # start comm with i2c bus
+gyro_sens, accel_sens = MPU6050_start()  # instantiate gyro/accel
+AK8963_start()  # instantiate magnetometer
