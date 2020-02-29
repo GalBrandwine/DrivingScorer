@@ -89,7 +89,6 @@ def handle_start_recording(event):
         tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
 
         current_score, average_score = driver_scorer.get_scoring()
-        print(current_score, average_score)
         window['-CURRENT_SCORE-'].update(current_score)
         window['-AVERAGE_SCORE-'].update(average_score)
 
