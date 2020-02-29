@@ -20,17 +20,24 @@ reg_write_dac = 0x40
 # Initialize I2C (SMBus)
 i2c = smbus.SMBus(channel)
 
+
 def readXYZ_acc():
     xyz_a_out = i2c.read_i2c_block_data(address_MPU9250, 0x3B, 6)
 
-    x = (xyz_a_out[0] | xyz_a_out[1] <<8)
-    y = (xyz_a_out[2] | xyz_a_out[3] <<8)
-    z = (xyz_a_out[4] | xyz_a_out[5] <<8)
+    x = (xyz_a_out[0] | xyz_a_out[1] << 8)
+    x = x if x < 32768 else x - 65536
+
+    y = (xyz_a_out[2] | xyz_a_out[3] << 8)
+    y = y if y < 32768 else y - 65536
+
+    z = (xyz_a_out[4] | xyz_a_out[5] << 8)
+    z = z if z < 32768 else z - 65536
     # return mag_combined  if mag_combined < 32768 else mag_combined - 65536
-    return x,y,z
+    return x, y, z
+
+
 # Create a sawtooth wave 16 times
 for i in range(0x10000):
-
     # get MPU9250 smbus block data
     # xyz_a_out = i2c.read_i2c_block_data(address_MPU9250, 0x3B, 6)
     print(readXYZ_acc())
