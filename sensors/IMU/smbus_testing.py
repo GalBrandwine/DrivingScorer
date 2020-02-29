@@ -9,7 +9,10 @@ import smbus
 channel = 1
 
 #  MCP4725 defaults to address 0x60
-address = 0x60
+# address = 0x60
+
+# MPU2950 address
+address_MPU9250 = 0x68
 
 # Register addresses (with "normal mode" power-down bits)
 reg_write_dac = 0x40
@@ -20,18 +23,8 @@ i2c = smbus.SMBus(channel)
 # Create a sawtooth wave 16 times
 for i in range(0x10000):
 
-    # Create our 12-bit number representing relative voltage
-    # voltage = i & 0xfff
-    #
-    # # Shift everything left by 4 bits and separate bytes
-    # msg = (voltage & 0xff0) >> 4
-    # msg = [msg, (msg & 0xf) << 4]
-    #
-    # # Write out I2C command: address, reg_write_dac, msg[0], msg[1]
-    # bus.write_i2c_block_data(address, reg_write_dac, msg)
-
     # get MPU9250 smbus block data
-    xyz_a_out = i2c.read_i2c_block_data(address, 0x3B, 6)
-    xyz_g_out = i2c.read_i2c_block_data(address, 0x43, 6)
+    xyz_a_out = i2c.read_i2c_block_data(address_MPU9250, 0x3B, 6)
+    xyz_g_out = i2c.read_i2c_block_data(address_MPU9250, 0x43, 6)
     print("xyz_a_out: {}".format(xyz_a_out))
-    print("xyz_g_out: {}".format(xyz_g_out))
+    # print("xyz_g_out: {}".format(xyz_g_out))
