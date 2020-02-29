@@ -1,15 +1,8 @@
 # i2ctest.py
-# A brief demonstration of the Raspberry Pi I2C interface, using the Sparkfun
-# Pi Wedge breakout board and a SparkFun MCP4725 breakout board:
-# https://www.sparkfun.com/products/8736
-
 import smbus
 
 # I2C channel 1 is connected to the GPIO pins
 channel = 1
-
-#  MCP4725 defaults to address 0x60
-# address = 0x60
 
 # MPU2950 address
 address_MPU9250 = 0x68
@@ -24,13 +17,21 @@ i2c = smbus.SMBus(channel)
 def readXYZ_acc():
     xyz_a_out = i2c.read_i2c_block_data(address_MPU9250, 0x3B, 6)
 
-    x = (xyz_a_out[0] | xyz_a_out[1] << 8)
+    # x = (xyz_a_out[0] | xyz_a_out[1] << 8)
+    # x = x if x < 32768 else x - 65536
+    #
+    # y = (xyz_a_out[2] | xyz_a_out[3] << 8)
+    # y = y if y < 32768 else y - 65536
+    #
+    # z = (xyz_a_out[4] | xyz_a_out[5] << 8)
+    # z = z if z < 32768 else z - 65536
+    x = (xyz_a_out[1] | xyz_a_out[0] << 8)
     x = x if x < 32768 else x - 65536
 
-    y = (xyz_a_out[2] | xyz_a_out[3] << 8)
+    y = (xyz_a_out[3] | xyz_a_out[2] << 8)
     y = y if y < 32768 else y - 65536
 
-    z = (xyz_a_out[4] | xyz_a_out[5] << 8)
+    z = (xyz_a_out[5] | xyz_a_out[4] << 8)
     z = z if z < 32768 else z - 65536
     # return mag_combined  if mag_combined < 32768 else mag_combined - 65536
     return x, y, z
