@@ -17,7 +17,7 @@ import driverScorer.driver_scoorer as drvr_scrr
 
 LOGTARGET = "CSV"
 # LOGTARGET = "CONSOLE"
-driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=True)
+driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=False)
 
 
 def start_recording(label: str):
@@ -34,7 +34,7 @@ WINDOWHEIGHT = 320
 
 
 plt.style.use('ggplot')  # matplotlib visual style setting
-fig, axs = plt.subplots(1, 1, figsize=(4, 3.5), sharex=True)
+fig, axs = plt.subplots(1, 1, figsize=(4, 3.5))
 cmap = plt.cm.Set1
 # t1 = time.time()  # for calculating sample rate
 # prepping for visualization
