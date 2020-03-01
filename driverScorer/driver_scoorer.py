@@ -23,7 +23,7 @@ class DrivingScorer:
         self._average_score: float = 1.0
         self._number_of_scores: float = 1.0
         self._current_driving_score: float = 0
-        self._previous_normalized_sensor_data: np.array([]) = np.random.uniform(0, 1, 3)
+        self._previous_normalized_sensor_data: np.array([]) = np.random.uniform(-1, 1, 6)
         self._driving_scores_arr: np.array([]) = np.zeros(self._MAXNUMBEROFSCORES)
 
         self._maximum_data_point: float = 0
