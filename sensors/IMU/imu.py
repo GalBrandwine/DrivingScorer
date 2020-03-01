@@ -16,5 +16,5 @@ class Imu:
             return self._data
         else:
             self._data = np.array(self._imu.mpu6050_conv())
-            print(self._data)
+            # print(self._data)
             return self._data
