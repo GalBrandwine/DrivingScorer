@@ -21,8 +21,9 @@ def start_recording(label: str):
 
 # GUI section
 sg.theme('DarkAmber')  # Add a touch of color
-SCORESIZING = (20, 5)
-LARGEBUTTONSIZE = (16, 6)
+FONT = ('Helvetica', 20)
+SCORESIZING = (20, 3)
+LARGEBUTTONSIZE = (8, 3)
 SMALLBUTTONSIZE = (16, 2)
 WINDOWWIDTH = 500
 WINDOWHEIGHT = 320
@@ -43,14 +44,15 @@ WINDOWHEIGHT = 320
 
 # All the stuff inside your window.
 column1 = [
-    [sg.Text(size=SMALLBUTTONSIZE), sg.Text('Who drives?', justification='center'), sg.Text(size=SMALLBUTTONSIZE)],
+    [sg.Text(size=SMALLBUTTONSIZE), sg.Text('Who drives?', justification='center', font=FONT),
+     sg.Text(size=SMALLBUTTONSIZE)],
 ]
 layout = [
     [sg.Column(column1, justification='center')],
     [sg.Text(size=SMALLBUTTONSIZE)],
-    [sg.Button('Gal', key="gal", size=LARGEBUTTONSIZE, button_color=('black', 'light sky blue')),
-     sg.Button('Rivka', key='rivka', size=LARGEBUTTONSIZE, button_color=('black', 'spring green')),
-     sg.Button('Other', key='other', size=LARGEBUTTONSIZE, button_color=('black', 'light pink'))]
+    [sg.Button('Gal', key="gal", size=LARGEBUTTONSIZE, button_color=('black', 'light sky blue'), font=FONT),
+     sg.Button('Rivka', key='rivka', size=LARGEBUTTONSIZE, button_color=('black', 'spring green'), font=FONT),
+     sg.Button('Other', key='other', size=LARGEBUTTONSIZE, button_color=('black', 'light pink'), font=FONT)]
 ]
 
 # Create the Window
@@ -62,12 +64,11 @@ def handle_start_recording(event):
     recording_window = [
         # [sg.Canvas(size=(WINDOWWIDTH - 20, WINDOWHEIGHT - 40), key='canvas')],
         [sg.Text(size=SMALLBUTTONSIZE)],
-        [sg.Text(size=SMALLBUTTONSIZE), sg.Text('CURRENT SCORE: ', size=SCORESIZING),
-         sg.Text('before', key='-CURRENT_SCORE-', size=SCORESIZING), sg.Text(size=SMALLBUTTONSIZE)],
-        [sg.Text(size=SMALLBUTTONSIZE)],
-        [sg.Text(size=SMALLBUTTONSIZE), sg.Text('AVERAGE SCORE: ', size=SCORESIZING),
-         sg.Text('before', key='-AVERAGE_SCORE-', size=SCORESIZING), sg.Text(size=SMALLBUTTONSIZE)],
-        [sg.Cancel()],
+        [sg.Text('CURRENT SCORE: ', size=SCORESIZING, font=FONT),
+         sg.Text('before', key='-CURRENT_SCORE-', size=SCORESIZING, font=FONT)],
+        [sg.Text('AVERAGE SCORE: ', size=SCORESIZING, font=FONT),
+         sg.Text('before', key='-AVERAGE_SCORE-', size=SCORESIZING, font=FONT)],
+        [sg.Cancel(font=FONT)],
         [sg.Text(size=SMALLBUTTONSIZE)]
     ]
 
