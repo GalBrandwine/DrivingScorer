@@ -16,3 +16,4 @@ class Imu:
             return self._data
         else:
             self._data = self._imu.mpu6050_conv()
+            return self._data
