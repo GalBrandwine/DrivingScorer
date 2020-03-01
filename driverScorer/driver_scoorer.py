@@ -9,7 +9,7 @@ from utils.logger import Logger
 # import a spcecific sensor
 # import imu as imu
 try:
-    import mpu9250_i2c as mpu9250
+    import sensors.IMU.mpu9250_i2c as mpu9250
 except Exception as e:
     # ON laptop - theres no GPIO, must use mock
     print(e)
