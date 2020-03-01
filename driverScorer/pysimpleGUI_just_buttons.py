@@ -5,10 +5,12 @@ import time
 import tkinter as Tk
 
 import PySimpleGUI as sg
+import matplotlib
 import matplotlib.backends.tkagg as tkagg
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, FigureCanvasAgg
 
+print("matplotlib sersion: {}".format(matplotlib.__version__))
 cwd = os.getcwd()
 sys.path.insert(0, cwd)
 import driverScorer.driver_scoorer as drvr_scrr
