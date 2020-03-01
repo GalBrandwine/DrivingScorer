@@ -110,8 +110,8 @@ class DrivingScorer:
         normalized_current_data = self._normalize_current_data(data)
 
         current_normalized_datascore_between_0_to_1 = self._get_norm_of_normalized_current_data(normalized_current_data)
-        print(current_normalized_datascore_between_0_to_1)
-        # self._update_scores_arr(current_normalized_datascore_between_0_to_1)
+        # print(current_normalized_datascore_between_0_to_1)
+        self._update_scores_arr(current_normalized_datascore_between_0_to_1)
 
     def _update_min_and_max(self, data):
         temp_min = data.min()
