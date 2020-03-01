@@ -1,3 +1,6 @@
+# Simple path fixes
+import os
+import sys
 import time
 import tkinter as Tk
 
@@ -6,6 +9,8 @@ import matplotlib.backends.tkagg as tkagg
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, FigureCanvasAgg
 
+cwd = os.getcwd()
+sys.path.insert(0, cwd)
 import driverScorer.driver_scoorer as drvr_scrr
 
 LOGTARGET = "CSV"
