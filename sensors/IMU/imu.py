@@ -15,5 +15,5 @@ class Imu:
             self._data = np.random.uniform(-1, 1, 6)  # ax, ay, az, wx, wy, wz
             return self._data
         else:
-            self._data = self._imu.mpu6050_conv()
+            self._data = np.array([self._imu.mpu6050_conv()])
             return self._data
