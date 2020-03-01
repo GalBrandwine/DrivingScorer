@@ -17,7 +17,7 @@ import driverScorer.driver_scoorer as drvr_scrr
 
 LOGTARGET = "CSV"
 # LOGTARGET = "CONSOLE"
-driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=False)
+driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=True)
 
 
 def start_recording(label: str):
@@ -31,16 +31,17 @@ SMALLBUTTONSIZE = (16, 2)
 WINDOWWIDTH = 500
 WINDOWHEIGHT = 320
 
-# fig = Figure(figsize=(10, 6), dpi=45)
+
 
 plt.style.use('ggplot')  # matplotlib visual style setting
-fig, axs = plt.subplots(2, 1, figsize=(4, 3.5), sharex=True)
+fig, axs = plt.subplots(1, 1, figsize=(4, 3.5), sharex=True)
 cmap = plt.cm.Set1
-t1 = time.time()  # for calculating sample rate
+# t1 = time.time()  # for calculating sample rate
 # prepping for visualization
 mpu6050_str = ['accel-x', 'accel-y', 'accel-z', 'gyro-x', 'gyro-y', 'gyro-z']
 AK8963_str = ['mag-x', 'mag-y', 'mag-z']
 
+# fig = Figure(figsize=(10, 6), dpi=45)
 # ax = fig.add_subplot(111)
 # ax.set_xlabel("Time")
 # ax.set_ylabel("Grade")
@@ -87,25 +88,25 @@ def handle_start_recording(event):
         if event == 'Exit' or event == 'Cancel' or event is None:
             return
 
-        axs[0].cla()
-        axs[0].grid()
-
-        axs[1].cla()
-        axs[1].grid()
+        axs.cla()
+        axs.grid()
+        #
+        # a1].cla()
+        # a1].grid()
 
         current_score_arr, t_vec = driver_scorer.get_raw_data()
 
-        axs[0].plot(t_vec, current_score_arr[:, 0], label=mpu6050_str[0], color=cmap(0))
-        axs[0].plot(t_vec, current_score_arr[:, 1], label=mpu6050_str[1], color=cmap(1))
-        axs[0].plot(t_vec, current_score_arr[:, 2], label=mpu6050_str[2], color=cmap(2))
-        axs[0].legend(bbox_to_anchor=(1.12, 0.9))
-        axs[0].set_ylabel('Acceleration [g]', fontsize=10)
+        axs.plot(t_vec, current_score_arr[:, 0], label=mpu6050_str[0], color=cmap(0))
+        axs.plot(t_vec, current_score_arr[:, 1], label=mpu6050_str[1], color=cmap(1))
+        axs.plot(t_vec, current_score_arr[:, 2], label=mpu6050_str[2], color=cmap(2))
+        axs.legend(bbox_to_anchor=(1.12, 0.9))
+        axs.set_ylabel('Acceleration [g]', fontsize=10)
 
-        axs[1].plot(t_vec, current_score_arr[:, 3], label=mpu6050_str[3], color=cmap(3))
-        axs[1].plot(t_vec, current_score_arr[:, 4], label=mpu6050_str[4], color=cmap(4))
-        axs[1].plot(t_vec, current_score_arr[:, 5], label=mpu6050_str[5], color=cmap(5))
-        axs[1].legend(bbox_to_anchor=(1.12, 0.9))
-        axs[1].set_ylabel('Angular Vel. [dps]', fontsize=10)
+        # axs[1].plot(t_vec, current_score_arr[:, 3], label=mpu6050_str[3], color=cmap(3))
+        # axs[1].plot(t_vec, current_score_arr[:, 4], label=mpu6050_str[4], color=cmap(4))
+        # axs[1].plot(t_vec, current_score_arr[:, 5], label=mpu6050_str[5], color=cmap(5))
+        # axs[1].legend(bbox_to_anchor=(1.12, 0.9))
+        # axs[1].set_ylabel('Angular Vel. [dps]', fontsize=10)
 
         fig.align_ylabels(axs)
 

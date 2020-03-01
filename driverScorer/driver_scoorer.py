@@ -23,7 +23,7 @@ class DrivingScorer:
         self._THREAD_INTERVAL_MS = 20
         self._MAXNUMBEROFSCORES = 10
 
-        self._sensor = imu.Imu(is_mock=False, sensor=mpu9250)
+        self._sensor = imu.Imu(is_mock, sensor=mpu9250)
         self.logger = Logger(logging_target)
         self._keep_running: bool = True
         self._threaded_data_recorder: Thread = None
@@ -32,7 +32,8 @@ class DrivingScorer:
 
         self._t_vec = np.zeros((self._MAXNUMBEROFSCORES, 6))
         self._raw_data: np.array([]) = np.zeros(
-            (self._MAXNUMBEROFSCORES, 6))  # np.random.uniform(-1, 1, (self._MAXNUMBEROFSCORES,6))
+            (self._MAXNUMBEROFSCORES, 6))
+        self._total_raw_data: np.array([]) = np.zeros((self._MAXNUMBEROFSCORES, 6))
 
         self._score_sum: float = 0
         self._average_score: float = 1.0
@@ -84,7 +85,8 @@ class DrivingScorer:
 
     def get_score_arr(self) -> (np.array([]), list):
         with self._data_lock:
-            return self._driving_scores_arr, self._t_vec
+            t_vec = np.subtract(self._t_vec, self._t_vec[0])
+            return self._driving_scores_arr, t_vec
 
     def _score_drive(self, data: np.array([])) -> None:
         """
@@ -94,15 +96,18 @@ class DrivingScorer:
         """
 
         # self._raw_data = np.concatenate((self._raw_data, [data]), axis=0)
-        # self._raw_data = np.append(self._raw_data, [data])
+        self._total_raw_data = np.concatenate((self._total_raw_data, [data]),axis=0)
+        # print(np.mean(self._total_raw_data,axis=0))
+        # print((np.mean(np.mean(self._total_raw_data,axis=0))))
+        print((np.average(np.average(self._total_raw_data,axis=0))))
         self._raw_data = np.roll(self._raw_data, -1)  # Shift left by one.
         self._raw_data[
             self._MAXNUMBEROFSCORES - 1] = data
 
-        self._update_min_and_max(data)
-        normalized_current_data = self._normalize_current_data(data)
-        current_normalized_datascore_between_0_to_1 = self._get_norm_of_normalized_current_data(normalized_current_data)
-        self._update_scores_arr(current_normalized_datascore_between_0_to_1)
+        # self._update_min_and_max(data)
+        # normalized_current_data = self._normalize_current_data(data)
+        # current_normalized_datascore_between_0_to_1 = self._get_norm_of_normalized_current_data(normalized_current_data)
+        # self._update_scores_arr(current_normalized_datascore_between_0_to_1)
 
     def _update_min_and_max(self, data):
         temp_min = data.min()
