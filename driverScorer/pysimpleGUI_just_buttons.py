@@ -62,10 +62,13 @@ def handle_start_recording(event):
     recording_window = [
         # [sg.Canvas(size=(WINDOWWIDTH - 20, WINDOWHEIGHT - 40), key='canvas')],
         [sg.Text(size=SMALLBUTTONSIZE)],
-        [sg.Text(size=SMALLBUTTONSIZE),sg.Text('CURRENT SCORE: ', size=SCORESIZING), sg.Text('before', key='-CURRENT_SCORE-', size=SCORESIZING),sg.Text(size=SMALLBUTTONSIZE)],
+        [sg.Text(size=SMALLBUTTONSIZE), sg.Text('CURRENT SCORE: ', size=SCORESIZING),
+         sg.Text('before', key='-CURRENT_SCORE-', size=SCORESIZING), sg.Text(size=SMALLBUTTONSIZE)],
         [sg.Text(size=SMALLBUTTONSIZE)],
-        [sg.Text(size=SMALLBUTTONSIZE),sg.Text('AVERAGE SCORE: ', size=SCORESIZING), sg.Text('before', key='-AVERAGE_SCORE-', size=SCORESIZING),sg.Text(size=SMALLBUTTONSIZE)],
-        [sg.Cancel()]
+        [sg.Text(size=SMALLBUTTONSIZE), sg.Text('AVERAGE SCORE: ', size=SCORESIZING),
+         sg.Text('before', key='-AVERAGE_SCORE-', size=SCORESIZING), sg.Text(size=SMALLBUTTONSIZE)],
+        [sg.Cancel()],
+        [sg.Text(size=SMALLBUTTONSIZE)]
     ]
 
     window.close()
