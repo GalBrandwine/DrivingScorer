@@ -2,9 +2,9 @@ import numpy as np
 
 
 class Imu:
-    def __init__(self, is_mock=False, imu=None, ):
+    def __init__(self, is_mock=False, sensor=None, ):
         self._is_mock = is_mock
-        self._imu = imu
+        self._imu = sensor
         if self._is_mock is True:
             print("IMU mock activated")
 

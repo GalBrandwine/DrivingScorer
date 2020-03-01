@@ -6,13 +6,23 @@ import numpy as np
 from sensors.IMU import imu
 from utils.logger import Logger
 
+# import a spcecific sensor
+# import imu as imu
+try:
+    import mpu9250_i2c as mpu9250
+except Exception as e:
+    # ON laptop - theres no GPIO, must use mock
+    mpu9250 = None
+    pass
+
 
 class DrivingScorer:
 
     def __init__(self, logging_target: str, is_mock=False):
         self._THREAD_INTERVAL_MS = 20
         self._MAXNUMBEROFSCORES = 50
-        self._sensor = imu.Imu(is_mock)
+
+        self._sensor = imu.Imu(is_mock, sensor=mpu9250)
         self.logger = Logger(logging_target)
         self._keep_running: bool = True
         self._threaded_data_recorder: Thread = None

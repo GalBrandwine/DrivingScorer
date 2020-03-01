@@ -85,10 +85,9 @@ def handle_start_recording(event):
 
         axs[1].cla()
         axs[1].grid()
-        # current_score_arr, t_vec = driver_scorer.get_score_arr()
 
         current_score_arr, t_vec = driver_scorer.get_raw_data()
-        # axs[0].plot(range(len(current_score_arr)), current_score_arr, color='purple')
+
         axs[0].plot(t_vec, current_score_arr[:, 0], label=mpu6050_str[0], color=cmap(0))
         axs[0].plot(t_vec, current_score_arr[:, 1], label=mpu6050_str[1], color=cmap(1))
         axs[0].plot(t_vec, current_score_arr[:, 2], label=mpu6050_str[2], color=cmap(2))
