@@ -10,13 +10,13 @@ import sys
 cwd = os.getcwd()
 sys.path.insert(0, cwd)
 
-# import mpu9250_i2c as mpu9250
+import mpu9250_i2c as mpu9250
 import imu as imu
 
 time.sleep(1)  # delay necessary to allow mpu9250 to settle
 
 print("Initiating IMU")
-imu = imu.Imu(is_mock=True)
+imu = imu.Imu(is_mock=False,sensor=mpu9250)
 print('recording data')
 while 1:
     try:

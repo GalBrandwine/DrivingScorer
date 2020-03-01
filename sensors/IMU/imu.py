@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Imu:
-    def __init__(self, is_mock=False, sensor=None, ):
+    def __init__(self, is_mock=False, sensor=None):
         self._is_mock = is_mock
         self._imu = sensor
         if self._is_mock is True:

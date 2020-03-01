@@ -19,11 +19,11 @@ except Exception as e:
 
 class DrivingScorer:
 
-    def __init__(self, logging_target: str, is_mock=False):
+    def __init__(self, logging_target: str, is_mock=True):
         self._THREAD_INTERVAL_MS = 20
         self._MAXNUMBEROFSCORES = 50
 
-        self._sensor = imu.Imu(is_mock, sensor=mpu9250)
+        self._sensor = imu.Imu(is_mock=False, sensor=mpu9250)
         self.logger = Logger(logging_target)
         self._keep_running: bool = True
         self._threaded_data_recorder: Thread = None
