@@ -21,7 +21,7 @@ class DrivingScorer:
 
     def __init__(self, logging_target: str, is_mock=True):
         self._THREAD_INTERVAL_MS = 20
-        self._MAXNUMBEROFSCORES = 50
+        self._MAXNUMBEROFSCORES = 10
 
         self._sensor = imu.Imu(is_mock=False, sensor=mpu9250)
         self.logger = Logger(logging_target)
