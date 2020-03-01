@@ -12,6 +12,7 @@ try:
     import mpu9250_i2c as mpu9250
 except Exception as e:
     # ON laptop - theres no GPIO, must use mock
+    print(e)
     mpu9250 = None
     pass
 
