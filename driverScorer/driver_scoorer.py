@@ -99,13 +99,16 @@ class DrivingScorer:
         self._total_raw_data = np.concatenate((self._total_raw_data, [data]),axis=0)
         # print(np.mean(self._total_raw_data,axis=0))
         # print((np.mean(np.mean(self._total_raw_data,axis=0))))
-        print((np.average(np.average(self._total_raw_data,axis=0))))
+
+        # print((np.average(np.average(self._total_raw_data,axis=0))))
+
         self._raw_data = np.roll(self._raw_data, -1)  # Shift left by one.
         self._raw_data[
             self._MAXNUMBEROFSCORES - 1] = data
 
-        # self._update_min_and_max(data)
-        # normalized_current_data = self._normalize_current_data(data)
+        self._update_min_and_max(data)
+        normalized_current_data = self._normalize_current_data(data)
+        print(normalized_current_data)
         # current_normalized_datascore_between_0_to_1 = self._get_norm_of_normalized_current_data(normalized_current_data)
         # self._update_scores_arr(current_normalized_datascore_between_0_to_1)
 
