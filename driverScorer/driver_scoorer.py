@@ -11,13 +11,17 @@ class DrivingScorer:
 
     def __init__(self, logging_target: str, is_mock=False):
         self._THREAD_INTERVAL_MS = 20
-        self._MAXNUMBEROFSCORES = 100
+        self._MAXNUMBEROFSCORES = 50
         self._sensor = imu.Imu(is_mock)
         self.logger = Logger(logging_target)
         self._keep_running: bool = True
         self._threaded_data_recorder: Thread = None
 
         self._data_lock = Lock()
+
+        self._t_vec = np.zeros((self._MAXNUMBEROFSCORES, 6))
+        self._raw_data: np.array([]) = np.zeros(
+            (self._MAXNUMBEROFSCORES, 6))  # np.random.uniform(-1, 1, (self._MAXNUMBEROFSCORES,6))
 
         self._score_sum: float = 0
         self._average_score: float = 1.0
@@ -39,15 +43,20 @@ class DrivingScorer:
                 # Critical section
                 self._score_drive(data)
                 self._record_data(data, label)
+                # self._t_vec.append(time.time())  # capture timestamp
+                self._t_vec = np.roll(self._t_vec, -1)  # Shift left by one.
+                self._t_vec[
+                    self._MAXNUMBEROFSCORES - 1] = time.time()
 
             time.sleep(self._THREAD_INTERVAL_MS / 1000.0)
 
     def _record_data(self, data: np.array([]), label: str):
-        self.logger.log_info("%f, %f, %f,%s", data[0], data[1], data[2], label)
+        self.logger.log_info("%f, %f, %f,%f, %f, %f,%s", data[0], data[1], data[2], data[3], data[4], data[5], label)
 
     def start(self, label) -> None:
         self._threaded_data_recorder = Thread(target=self._process_data, args=(label,))
         self._threaded_data_recorder.start()
+        # self._t_vec.append(time.time())  # capture timestamp
 
     def stop(self) -> None:
         self._keep_running = False
@@ -57,9 +66,14 @@ class DrivingScorer:
         with self._data_lock:
             return self._current_driving_score, self._average_score
 
-    def get_score_arr(self) -> np.array([]):
+    def get_raw_data(self) -> (np.array([]), list):
         with self._data_lock:
-            return self._driving_scores_arr
+            t_vec = np.subtract(self._t_vec, self._t_vec[0])
+            return self._raw_data, t_vec
+
+    def get_score_arr(self) -> (np.array([]), list):
+        with self._data_lock:
+            return self._driving_scores_arr, self._t_vec
 
     def _score_drive(self, data: np.array([])) -> None:
         """
@@ -68,8 +82,13 @@ class DrivingScorer:
         :return: None
         """
 
-        self._update_min_and_max(data)
+        # self._raw_data = np.concatenate((self._raw_data, [data]), axis=0)
+        # self._raw_data = np.append(self._raw_data, [data])
+        self._raw_data = np.roll(self._raw_data, -1)  # Shift left by one.
+        self._raw_data[
+            self._MAXNUMBEROFSCORES - 1] = data
 
+        self._update_min_and_max(data)
         normalized_current_data = self._normalize_current_data(data)
         current_normalized_datascore_between_0_to_1 = self._get_norm_of_normalized_current_data(normalized_current_data)
         self._update_scores_arr(current_normalized_datascore_between_0_to_1)
@@ -125,6 +144,10 @@ if __name__ == "__main__":
 
     driving_scorer.start("Gal")
 
-    time.sleep(3)
+    nump_of_scores = 100
+    while nump_of_scores > 0:
+        data, t_vect = driving_scorer.get_raw_data()
+        nump_of_scores = nump_of_scores - 1
+
     driving_scorer.stop()
     print("main end")
