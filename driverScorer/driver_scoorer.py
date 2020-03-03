@@ -96,7 +96,10 @@ class DrivingScorer:
         """
 
         # self._raw_data = np.concatenate((self._raw_data, [data]), axis=0)
+        distance_between_current_data_and_prev = np.linalg.norm(self._total_raw_data[-1] - data)
+        print("distance_between_current_data_and_prev: ".format(distance_between_current_data_and_prev))
         self._total_raw_data = np.concatenate((self._total_raw_data, [data]),axis=0)
+
         # print(np.mean(self._total_raw_data,axis=0))
         # print((np.mean(np.mean(self._total_raw_data,axis=0))))
 
@@ -167,7 +170,11 @@ if __name__ == "__main__":
     nump_of_scores = 100
     while nump_of_scores > 0:
         data, t_vect = driving_scorer.get_raw_data()
+        current_score = driving_scorer.get_scoring()
+        print(current_score)
         nump_of_scores = nump_of_scores - 1
+
+        time.sleep(0.2)
 
     driving_scorer.stop()
     print("main end")

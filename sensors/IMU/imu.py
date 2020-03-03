@@ -12,7 +12,7 @@ class Imu:
 
     def get_data(self) -> np.array([]):
         if self._is_mock is True:
-            self._data = np.random.uniform(-1, 1, 6)  # ax, ay, az, wx, wy, wz
+            self._data = np.random.uniform(-10, 10, 6)  # ax, ay, az, wx, wy, wz
             return self._data
         else:
             self._data = np.array(self._imu.mpu6050_conv())
