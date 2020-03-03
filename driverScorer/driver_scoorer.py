@@ -162,7 +162,7 @@ if __name__ == "__main__":
     import time
 
     driving_scorer = DrivingScorer("CONSOLE",
-                                   is_mock=True)
+                                   is_mock=False)
     driving_scorer.logger.log_info("Main    : before creating thread")
 
     driving_scorer.start("Gal")
