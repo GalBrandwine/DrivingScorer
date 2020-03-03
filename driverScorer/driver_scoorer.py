@@ -2,7 +2,14 @@ from threading import Lock
 from threading import Thread
 
 import numpy as np
+import os
+import sys
+cwd = os.getcwd()
 
+from pathlib import Path
+path = Path(cwd)
+print(path)
+sys.path.insert(0, path.parent)
 from sensors.IMU import imu
 from utils.logger import Logger
 
