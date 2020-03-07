@@ -37,7 +37,8 @@ class DrivingScorer:
         self._input_ticks = 1000 / self._THREAD_INTERVAL_MS
         self._warm_up_time_passed = False
         self._first_10_seconds = 10
-        self._std_dev = []
+        self._std_dev = np.zeros((1, 6))  # Std per axe
+
         # self._t_vec = np.zeros((self._MAXNUMBEROFSCORES, 6))
         # self._raw_data: np.array([]) = np.zeros(
         #     (self._MAXNUMBEROFSCORES, 6))
@@ -59,44 +60,46 @@ class DrivingScorer:
 
         while self._keep_running:
             data = self._sensor.get_data()
-            with self._data_lock:
-                # Critical section
+
+            with self._data_lock:  # Critical section
+
                 self._preprocess_data(data)
-                # self._score_drive(data)
-                # self._record_data(data, label)
+                self._record_data(data, label)
                 # self._t_vec.append(time.time())  # capture timestamp
                 # self._t_vec = np.roll(self._t_vec, -1)  # Shift left by one.
                 # self._t_vec[
                 #     self._MAXNUMBEROFSCORES - 1] = time.time()
 
-            if self._input_ticks < 0:  # Happen every 1 second
-                self._input_ticks = 1000 / self._THREAD_INTERVAL_MS
+                if self._input_ticks < 0:  # Happen every 1 second
+                    self._input_ticks = 1000 / self._THREAD_INTERVAL_MS
 
-                if self._warm_up_time_passed is True:
-                    self._score_drive()
-                else:
-                    if self._first_10_seconds >= 0:
-                        print("Warming up.. %d sec left" % (self._first_10_seconds))
-                        self._first_10_seconds = self._first_10_seconds - 1
-
+                    if self._warm_up_time_passed is True:
+                        self._score_drive()
                     else:
-                        print("Done warming up.")
-                        self._std_dev = [statistics.stdev(self._data_container[:, axe]) for axe in range(6)]
-                        self._warm_up_time_passed = True
-                        print("Sensor noise per ax:")
-                        print(self._std_dev)
-                # print("RESETED")
+                        if self._first_10_seconds >= 0:
+                            print("Warming up.. %d sec left" % self._first_10_seconds)
+                            self._first_10_seconds = self._first_10_seconds - 1
+
+                        else:
+                            print("Done warming up.")
+                            self._std_dev = [[statistics.stdev(self._data_container[:, axe]) for axe in range(6)]]
+                            print("Sensor noise per ax:")
+                            print(self._std_dev)
+
+                            self._data_container = np.zeros((1, 6))  # Clean data container
+                            self._warm_up_time_passed = True
+
+                    # print("RESETED")
 
             self._input_ticks = self._input_ticks - 1
             time.sleep(self._THREAD_INTERVAL_MS / 1000.0)
 
     def _record_data(self, data: np.array([]), label: str):
-        self.logger.log_info("%f, %f, %f,%f, %f, %f,%s", data[0], data[1], data[2], data[3], data[4], data[5], label)
+        self.logger.log_info("%f, %f, %f,%f, %f, %f, %s", data[0], data[1], data[2], data[3], data[4], data[5], label)
 
     def start(self, label) -> None:
         self._threaded_data_recorder = Thread(target=self._process_data, args=(label,))
         self._threaded_data_recorder.start()
-        # self._t_vec.append(time.time())  # capture timestamp
 
     def stop(self) -> None:
         self._keep_running = False
@@ -187,24 +190,27 @@ class DrivingScorer:
 
     def _preprocess_data(self, data: np.array([])):
         """
-        Add new data to cyclic data queue - for grading
-        :param data:
+        Add new data to cyclic data queue - for grading.
+
+        NOTE: self._std_dev should be filled with zeros until the end of the warm-up.
+        :param data: raw-data from sensor
         :return:
         """
-        self._data_container = np.concatenate((self._data_container, [data]), axis=0)
+        denoised_data = data - self._std_dev
+        self._data_container = np.concatenate((self._data_container, denoised_data), axis=0)
         # self._data_queue.append(data)
 
 
 if __name__ == "__main__":
     import time
 
-    driving_scorer = DrivingScorer("CONSOLE", is_sim=False,
-                                   is_mock=True)
+    driving_scorer = DrivingScorer("CSV", is_sim=True,
+                                   is_mock=False)
     driving_scorer.logger.log_info("Main    : before creating thread")
 
     driving_scorer.start("Gal")
 
-    nump_of_scores = 100
+    nump_of_scores = 1000
     while nump_of_scores > 0:
         # data, t_vect = driving_scorer.get_raw_data()
         # current_score = driving_scorer.get_scoring()
