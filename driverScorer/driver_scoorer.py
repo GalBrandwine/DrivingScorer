@@ -1,7 +1,8 @@
+import statistics
 from collections import deque
 from threading import Lock
 from threading import Thread
-import statistics
+
 import numpy as np
 
 from sensors.IMU import imu
@@ -20,20 +21,23 @@ except Exception as e:
 
 class DrivingScorer:
 
-    def __init__(self, logging_target: str, is_mock=True):
+    def __init__(self, logging_target: str, is_sim=False, is_mock=True):
         self._THREAD_INTERVAL_MS = 20  # 50 hz
         self._MAXNUMBEROFSCORES = 50  # fill queue with new data every 1 second
 
-        self._sensor = imu.Imu(is_mock, sensor=mpu9250)
+        self._sensor = imu.Imu(is_sim=is_sim, is_mock=is_mock, sensor=mpu9250)
         self.logger = Logger(logging_target)
         self._keep_running: bool = True
         self._threaded_data_recorder: Thread = None
 
         self._data_lock = Lock()
 
+        self._data_container: np.array([]) = np.zeros((1, 6))
         self._data_queue = deque(maxlen=self._MAXNUMBEROFSCORES)
         self._input_ticks = 1000 / self._THREAD_INTERVAL_MS
+        self._warm_up_time_passed = False
         self._first_10_seconds = 10
+        self._std_dev = []
         # self._t_vec = np.zeros((self._MAXNUMBEROFSCORES, 6))
         # self._raw_data: np.array([]) = np.zeros(
         #     (self._MAXNUMBEROFSCORES, 6))
@@ -57,7 +61,7 @@ class DrivingScorer:
             data = self._sensor.get_data()
             with self._data_lock:
                 # Critical section
-                self._preproccess_data(data)
+                self._preprocess_data(data)
                 # self._score_drive(data)
                 # self._record_data(data, label)
                 # self._t_vec.append(time.time())  # capture timestamp
@@ -65,10 +69,23 @@ class DrivingScorer:
                 # self._t_vec[
                 #     self._MAXNUMBEROFSCORES - 1] = time.time()
 
-            if self._input_ticks < 0:  # Hapen every 1 second
+            if self._input_ticks < 0:  # Happen every 1 second
                 self._input_ticks = 1000 / self._THREAD_INTERVAL_MS
-                self._score_drive()
-                print("RESETED")
+
+                if self._warm_up_time_passed is True:
+                    self._score_drive()
+                else:
+                    if self._first_10_seconds >= 0:
+                        print("Warming up.. %d sec left" % (self._first_10_seconds))
+                        self._first_10_seconds = self._first_10_seconds - 1
+
+                    else:
+                        print("Done warming up.")
+                        self._std_dev = [statistics.stdev(self._data_container[:, axe]) for axe in range(6)]
+                        self._warm_up_time_passed = True
+                        print("Sensor noise per ax:")
+                        print(self._std_dev)
+                # print("RESETED")
 
             self._input_ticks = self._input_ticks - 1
             time.sleep(self._THREAD_INTERVAL_MS / 1000.0)
@@ -105,15 +122,6 @@ class DrivingScorer:
         :param data: Updated sensor data.
         :return: None
         """
-        if self._first_10_seconds >= 0:
-            # Add to avarage.
-            # Add to STD
-            std_dev = statistics.stdev(self._data_queue)
-            print(std_dev)
-            self._first_10_seconds = self._first_10_seconds - 1
-
-
-
 
         # self._raw_data = np.concatenate((self._raw_data, [data]), axis=0)
         # distance_between_current_data_and_prev = np.linalg.norm(self._total_raw_data[-1] - data)
@@ -177,20 +185,20 @@ class DrivingScorer:
 
         self._average_score = self._score_sum / self._number_of_scores
 
-    def _preproccess_data(self, data: np.array([])):
+    def _preprocess_data(self, data: np.array([])):
         """
         Add new data to cyclic data queue - for grading
         :param data:
         :return:
         """
-        self._data_queue.append(data)
-
+        self._data_container = np.concatenate((self._data_container, [data]), axis=0)
+        # self._data_queue.append(data)
 
 
 if __name__ == "__main__":
     import time
 
-    driving_scorer = DrivingScorer("CONSOLE",
+    driving_scorer = DrivingScorer("CONSOLE", is_sim=False,
                                    is_mock=True)
     driving_scorer.logger.log_info("Main    : before creating thread")
 
