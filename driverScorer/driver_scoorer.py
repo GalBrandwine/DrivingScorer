@@ -21,11 +21,11 @@ except Exception as e:
 
 class DrivingScorer:
 
-    def __init__(self, logging_target: str, is_sim=False, is_mock=True):
+    def __init__(self, logging_target: str, use_case="sensor"):
         self._THREAD_INTERVAL_MS = 20  # 50 hz
         self._MAXNUMBEROFSCORES = 50  # fill queue with new data every 1 second
 
-        self._sensor = imu.Imu(is_sim=is_sim, is_mock=is_mock, sensor=mpu9250)
+        self._sensor = imu.Imu(use_case=use_case, sensor=mpu9250)
         self.logger = Logger(logging_target)
         self._keep_running: bool = True
         self._threaded_data_recorder: Thread = None
@@ -204,8 +204,7 @@ class DrivingScorer:
 if __name__ == "__main__":
     import time
 
-    driving_scorer = DrivingScorer("CSV", is_sim=True,
-                                   is_mock=False)
+    driving_scorer = DrivingScorer("CSV", use_case="simulator")
     driving_scorer.logger.log_info("Main    : before creating thread")
 
     driving_scorer.start("Gal")

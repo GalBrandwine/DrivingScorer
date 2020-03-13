@@ -12,7 +12,7 @@ import driverScorer.driver_scoorer as drvr_scrr
 
 LOGTARGET = "CSV"
 # LOGTARGET = "CONSOLE"
-driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, is_mock=False)
+driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, use_case=False)
 
 
 def start_recording(label: str):
