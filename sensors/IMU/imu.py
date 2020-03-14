@@ -34,7 +34,8 @@ class Imu:
                 self._data = self._df.iloc[self._current_row,
                              1:-1].values  # ax, ay, az, wx, wy, wz (skip TimeStamp, and Label)
                 self._current_row = self._current_row + 1
-            return self._data
+                return self._data
+            return np.zeros((6))
         if self._use_case == "sensor":
             self._data = np.array(self._imu.mpu6050_conv())
             return self._data
