@@ -82,112 +82,192 @@ def fig_gyro_xyz(df_input: pd, given_title: str):
     fig.show()
 
 
-def fig_grades(grades, given_title):
+def fig_grades(grades, given_title, sensor_data=None):
     fig = go.Figure(
-        data=go.Scatter(x=grades["time"], y=grades["grade"]),
+        data=go.Scatter(x=grades["time"], y=grades["grade"], name="grade [higher is better]"),
         layout=go.Layout(
             title=go.layout.Title(text=given_title)
         )
     )
+    if sensor_data is not None:
+        fig.add_trace(
+            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['ax'], name="ax"),
+        )
+
+        fig.add_trace(
+            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['ay'], name="ay"),
+        )
+
+        fig.add_trace(
+            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['az'], name="gz"),
+        )
+        fig.add_trace(
+            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['gx'], name="gx"),
+        )
+
+        fig.add_trace(
+            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['gy'], name="gy"),
+        )
+
+        fig.add_trace(
+            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['gz'], name="gz"),
+        )
     fig.show()
 
 
 def calculate_std(df: pd, sample_time=-1) -> pd.DataFrame:
-    if sample_time > -1:
+    if sample_time > -1:  # Remove STD of a specific record time ( useful if having a sensor "warm-up" time)
         temp = df[df['elapsed'] <= sample_time]
         std = temp.std()
         return std
-    return df.std()
+    return df.std()  # Remove STD from all sampled data.
 
 
-def grader(df_std_remove: pd, window: int) -> int:
-    pass
-
-
-# windowed: pd.DataFrame = df_std_remove.copy()
-#
-# min_max_scaler = preprocessing.MinMaxScaler()
-# scaled = min_max_scaler.fit_transform(windowed.iloc[:, 1:7])
-#
-# # windowed.iloc[:, 1:7] = scaled
-# # windowed['elapsed'] = df_std_remove['elapsed'] - df_std_remove['elapsed'].iloc[0]  # Fix timing
-# # windowed = windowed[windowed['elapsed'] < window]  # Filter
-# #
-# # # win_size =  [windowed['elapsed'] <= window].count("True")
-# # # res = windowed.rolling(len(win_size)).mean()
-#
-# axe_weight = (100 / 6.0)  # Each weight is 16.6%, the sum of all weights is 100%
-# # axes_weights = [axe_weight * 4, axe_weight / 4, axe_weight / 4, axe_weight, axe_weight / 4, axe_weight / 4]
-# axes_weights = [axe_weight, axe_weight, axe_weight, axe_weight, axe_weight, axe_weight]
-#
-# g = windowed.groupby('ax')
-# res = windowed.value / g.value.transform("sum") * axes_weights[0]
-#
-# avarage = windowed.mean()
-# # weighted = avarage.iloc[1:7] * axes_weights
-#
-#
-# # scaled = min_max_scaler.fit_transform(windowed.iloc[:, 1:7])
-# # df = pd.DataFrame(scaled, columns=['ax', 'ay', 'az', 'gx', 'gy', 'gz'])
-#
-# res = windowed.iloc[:, 1:7].mean() * axes_weights
-# return res.sum()
-
-
-def calc_window_size(std_removed: pd.DataFrame, window_size_sec: int) -> int:
+def calc_window_size(std_removed: pd.DataFrame, window_size_sec: float) -> int:
     """
 
     :param std_removed:
     :param window_size_sec:
     :return: Number of rows that represent 'window_size_sec'
     """
+
     df = std_removed.copy()
+    df = df.fillna(0)
     df['elapsed'] = df['elapsed'] - df['elapsed'].iloc[0]  # Fix timing
     return df[df['elapsed'] < window_size_sec].shape[0]
 
 
-def calc_sliding_window_and_fig(std_removed_input):
+def fig_normalize(un_normalized_data) -> pd.DataFrame:
+    df = un_normalized_data.copy()
+    df = df.iloc[:, 1:7]
+    df -= df.min()  # equivalent to df = df - df.min()
+    df /= df.max()  # equivalent to df = df / df.max()
+    df['elapsed'] = un_normalized_data['elapsed']  # Keep original data
+    return df
+
+
+def calc_mean_using_sliding_window(std_removed_input, window_size_sec_input: float = 1.0) -> pd.DataFrame:
+    window_size = window_size_sec_input
+    window_size_rows = calc_window_size(std_removed_input, window_size)
+    mean = std_removed_input.rolling(window_size_rows, win_type='triang').mean()
+    return mean
+    # axes_weights = pd.DataFrame({'wax': [10], 'way': [10], 'waz': [10], 'wgx': [10], 'wgy': [10], 'wgz': [10]})
+
+
+def prepare_fig_df1_and_df2_gyro(df1, df2, df1_trace_title, df2_trace_title, given_title) -> go.Figure:
+    fig = make_subplots(rows=3, cols=1,
+                        shared_xaxes=True,
+
+                        subplot_titles=("gX", "gY", "gZ"))
+    # GX
+    fig.add_trace(
+        go.Scatter(x=df1['elapsed'], y=df1['gx'], name="gx {}".format(df1_trace_title)),
+        row=1, col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df2['elapsed'], y=df2['gx'], name="gx {}".format(df2_trace_title)),
+        row=1, col=1
+    )
+
+    # GY
+    fig.add_trace(
+        go.Scatter(x=df1['elapsed'], y=df1['gy'], name="gy {}".format(df1_trace_title)),
+        row=2, col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df2['elapsed'], y=df2['ay'], name="ay {}".format(df2_trace_title)),
+        row=2, col=1
+    )
+
+    # GZ
+    fig.add_trace(
+        go.Scatter(x=df1['elapsed'], y=df1['gz'], name="gz {}".format(df1_trace_title)),
+        row=3, col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df2['elapsed'], y=df2['gz'], name="gz {}".format(df2_trace_title)),
+        row=3, col=1
+    )
+    return fig
+
+
+def prepare_fig_df1_and_df2_acc(df1, df2, df1_trace_title, df2_trace_title, given_title) -> go.Figure:
+    fig = make_subplots(rows=3, cols=1,
+                        shared_xaxes=True,
+
+                        subplot_titles=("aX", "aY", "aZ"))
+    # AX
+    fig.add_trace(
+        go.Scatter(x=df1['elapsed'], y=df1['ax'], name="ax {}".format(df1_trace_title)),
+        row=1, col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df2['elapsed'], y=df2['ax'], name="ax {}".format(df2_trace_title)),
+        row=1, col=1
+    )
+
+    # AY
+    fig.add_trace(
+        go.Scatter(x=df1['elapsed'], y=df1['ay'], name="ay {}".format(df1_trace_title)),
+        row=2, col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df2['elapsed'], y=df2['ay'], name="ay {}".format(df2_trace_title)),
+        row=2, col=1
+    )
+
+    # AZ
+    fig.add_trace(
+        go.Scatter(x=df1['elapsed'], y=df1['az'], name="az {}".format(df1_trace_title)),
+        row=3, col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df2['elapsed'], y=df2['az'], name="az {}".format(df2_trace_title)),
+        row=3, col=1
+    )
+    return fig
+
+
+def fig_df1_and_df2(df1, df2, sensor: str, df1_trace_title, df2_trace_title, given_title):
+    if sensor == "acc":
+        fig = prepare_fig_df1_and_df2_acc(df1, df2, df1_trace_title, df2_trace_title, given_title)
+
+    if sensor == "gyro":
+        fig = prepare_fig_df1_and_df2_gyro(df1, df2, df1_trace_title, df2_trace_title, given_title)
+
+    # # Update xaxis properties
+    fig.update_xaxes(title_text="Elapsed time [sec]", row=3, col=1)
+    fig.update_layout(title_text=given_title)
+    fig.show()
+
+
+def remove_std(df: pd.DataFrame, calculated_std) -> pd.DataFrame:
+    std_removed = df.copy()
+    std_removed = std_removed.iloc[:, :7] - calculated_std[:7]  # Remove std from sensor data only
+    return std_removed
+
+
+def calc_grades(mean_normalized_data: pd.DataFrame) -> pd.DataFrame:
+    window_size_sec = 0.2
+    window_size_rows = calc_window_size(mean_normalized_data, window_size_sec)
+
+    to_be_graded = mean_normalized_data.copy()
 
     grades: pd.DataFrame = pd.DataFrame(columns=["time", "grade"])
-    window_size_sec = 1.0
-    window_size_rows = calc_window_size(std_removed_input, window_size_sec)
-    mean = std_removed_input.rolling(window_size_rows, win_type='triang').mean()
+    grades["time"] = to_be_graded["elapsed"]
 
-    #
-    # for index, row in std_removed.iterrows():
-    #     grade = grader(std_removed.iloc[line:], window=window_size)
-    #     end_of_window = std_removed.iloc[line]['elapsed']
-    #
-    #     grades.loc[line, 'time'] = end_of_window + window_size / 2
-    #     grades.loc[line, 'grade'] = grade
-    #
-    #     line = line + 1
+    mean = to_be_graded.rolling(window_size_rows, win_type='triang').mean()
 
-    # mean[mean.isna()] = 0
-
-    # using numpy average() method
-
-    axes_weights = pd.DataFrame({'wax': [10], 'way': [10], 'waz': [10], 'wgx': [10], 'wgy': [10], 'wgz': [10]})
-
-
-    fig_acc_xyz(mean, given_title="IMU data (sliding window mean): acc XYZ")
-    fig_gyro_xyz(mean, given_title="IMU data (sliding window mean): gyro XYZ")
-
-    df_norm = mean.iloc[:,:6]
-    df_norm -= df_norm.min()  # equivalent to df = df - df.min()
-    df_norm /= df_norm.max()  # equivalent to df = df / df.max()
-
-    # df_norm = (mean - mean.mean()) / (mean.max() - mean.min())
-    df_norm['elapsed'] = mean['elapsed']
-
-    # g = df_norm.groupby('Date')
-    #
-    # df_norm.value / g.value.transform("sum") * axes_weights.wt
-
-    fig_acc_xyz(df_norm, given_title="IMU data (sliding window mean normalized): acc XYZ")
-    fig_gyro_xyz(df_norm, given_title="IMU data (sliding window mean normalized): gyro XYZ")
-
-    # fig_grades(grades, given_title="IMU grades")
+    # Relating as if each axe has same weight.
+    grades["grade"] = to_be_graded.transpose().iloc[1:6, :].sum() / 6  # Data in each axe is in range [0,1], sensor have 6 axes.
+    grades["grade"] = grades["grade"] * 10  # Make data be in range [0,5]
+    return grades
 
 
 if __name__ == "__main__":
@@ -196,15 +276,58 @@ if __name__ == "__main__":
     df = pd.read_csv(csv_name)
 
     df = fix_time_stamp(df)
-    fig_acc_xyz(df, given_title="IMU data: acc XYZ")
-    fig_gyro_xyz(df, given_title="IMU data: gyro XYZ")
+    # fig_acc_xyz(df, given_title="IMU raw data: acc XYZ")
+    # fig_gyro_xyz(df, given_title="IMU raw data: gyro XYZ")
 
     std_per_axe = calculate_std(df, sample_time=10)
     print(std_per_axe)
-    std_removed = df.iloc[:, :7] - std_per_axe[:7]
+    std_removed = remove_std(df, std_per_axe)
+
     std_removed['elapsed'] = df['elapsed']
+    fig_df1_and_df2(df, std_removed, sensor="acc", df1_trace_title="raw data", df2_trace_title="std_removed",
+                    given_title="IMU data, raw vs std_removed")
 
-    fig_acc_xyz(std_removed, given_title="IMU data: acc XYZ (std_removed)")
-    fig_gyro_xyz(std_removed, given_title="IMU data: gyro XYZ (std_removed)")
+    # fig_acc_xyz(std_removed, given_title="IMU data: acc XYZ (std_removed)")
+    # fig_gyro_xyz(std_removed, given_title="IMU data: gyro XYZ (std_removed)")
 
-    calc_sliding_window_and_fig(std_removed)
+    # window_size_sec = 1.0
+    # mean = calc_mean_using_sliding_window(std_removed, window_size_sec)
+    # fig_sensor = "acc"
+    # fig_df1_and_df2(std_removed, mean, sensor=fig_sensor, df1_trace_title="std_removed", df2_trace_title="mean",
+    #                 given_title="IMU {} XYZ data, std_removed and mean. sliding_window size {} [sec]".format(
+    #                     fig_sensor, window_size_sec))
+    # fig_sensor = "gyro"
+    # fig_df1_and_df2(std_removed, mean, sensor=fig_sensor, df1_trace_title="std_removed", df2_trace_title="mean",
+    #                 given_title="IMU {} XYZ data, std_removed and mean. sliding_window size {} [sec]".format(
+    #                     fig_sensor, window_size_sec))
+
+    window_size_sec = 0.2
+    # mean = calc_mean_using_sliding_window(std_removed, window_size_sec)
+    # fig_sensor = "acc"
+    # fig_df1_and_df2(std_removed, mean, sensor=fig_sensor, df1_trace_title="std_removed", df2_trace_title="mean",
+    #                 given_title="IMU {} XYZ data, std_removed and mean. sliding_window size {} [sec]".format(
+    #                     fig_sensor, window_size_sec))
+    # fig_sensor = "gyro"
+    # fig_df1_and_df2(std_removed, mean, sensor=fig_sensor, df1_trace_title="std_removed", df2_trace_title="mean",
+    #                 given_title="IMU {} XYZ data, std_removed and mean. sliding_window size {} [sec]".format(
+    #                     fig_sensor, window_size_sec))
+
+    # fig_acc_xyz(mean, given_title="IMU data (sliding window mean): acc XYZ")
+    # fig_gyro_xyz(mean, given_title="IMU data (sliding window mean): gyro XYZ")
+
+    std_removed_normalized = fig_normalize(std_removed)
+    mean_normalized = calc_mean_using_sliding_window(std_removed_normalized, window_size_sec)
+    fig_sensor = "acc"
+    fig_df1_and_df2(std_removed_normalized, mean_normalized,
+                    sensor=fig_sensor,
+                    df1_trace_title="std_removed_normalized",
+                    df2_trace_title="mean_normalized",
+                    given_title="IMU {} XYZ data, mean_normalized and std_removed_normalized. sliding_window size {} [sec]".format(
+                        fig_sensor, window_size_sec))
+    grades = calc_grades(mean_normalized)
+    average_grade = grades["grade"].mean()
+    fig_grades(grades, "grades [average grade: {}]".format(average_grade), sensor_data=mean_normalized)
+    # fig_acc_xyz(std_removed_normalized, given_title="IMU std_removed_normalized data: acc XYZ")
+    # fig_gyro_xyz(std_removed_normalized, given_title="IMU std_removed_normalized data: gyro XYZ")
+    # fig_acc_xyz(mean_normalized, given_title="IMU data (sliding window mean normalized): acc XYZ")
+    # fig_gyro_xyz(mean_normalized, given_title="IMU data (sliding window mean normalized): gyro XYZ")
