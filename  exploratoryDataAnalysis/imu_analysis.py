@@ -84,11 +84,12 @@ def fig_gyro_xyz(df_input: pd, given_title: str):
 
 def fig_grades(grades, given_title, sensor_data=None):
     fig = go.Figure(
-        data=go.Scatter(x=grades["time"], y=grades["grade"], name="grade [higher is better]"),
+        data=go.Scatter(x=grades['time'], y=grades['raw_diff_abs'], name="raw_diff_abs"),
         layout=go.Layout(
             title=go.layout.Title(text=given_title)
         )
     )
+
     if sensor_data is not None:
         fig.add_trace(
             go.Scatter(x=sensor_data['elapsed'], y=sensor_data['ax'], name="ax"),
@@ -99,7 +100,7 @@ def fig_grades(grades, given_title, sensor_data=None):
         )
 
         fig.add_trace(
-            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['az'], name="gz"),
+            go.Scatter(x=sensor_data['elapsed'], y=sensor_data['az'], name="az"),
         )
         fig.add_trace(
             go.Scatter(x=sensor_data['elapsed'], y=sensor_data['gx'], name="gx"),
@@ -254,19 +255,54 @@ def remove_std(df: pd.DataFrame, calculated_std) -> pd.DataFrame:
 
 
 def calc_grades(mean_normalized_data: pd.DataFrame) -> pd.DataFrame:
-    window_size_sec = 0.2
-    window_size_rows = calc_window_size(mean_normalized_data, window_size_sec)
+    """
+
+    :param mean_normalized_data:
+    :return:
+    """
+    # window_size_sec = 0.2
+    # window_size_rows = calc_window_size(mean_normalized_data, window_size_sec)
 
     to_be_graded = mean_normalized_data.copy()
 
-    grades: pd.DataFrame = pd.DataFrame(columns=["time", "grade"])
+    grades: pd.DataFrame = pd.DataFrame(
+        columns=["time", "data_sum", "data_sum_diff_abs", "raw_diff_abs"])
     grades["time"] = to_be_graded["elapsed"]
 
-    mean = to_be_graded.rolling(window_size_rows, win_type='triang').mean()
+    # mean = to_be_graded.rolling(window_size_rows, win_type='triang').mean()
+    mean_normalized2 = to_be_graded.copy()
+    mean_normalized2.iloc[:, :6] = mean_normalized2.iloc[:, :6].diff(periods=10).abs()
+    grades["raw_diff_abs"] = mean_normalized2.transpose().iloc[1:6, :].sum()  # .diff(periods=10).abs()
 
     # Relating as if each axe has same weight.
-    grades["grade"] = to_be_graded.transpose().iloc[1:6, :].sum() / 6  # Data in each axe is in range [0,1], sensor have 6 axes.
-    grades["grade"] = grades["grade"] * 10  # Make data be in range [0,5]
+    grades["data_sum"] = to_be_graded.transpose().iloc[1:6,
+                         :].sum()  # Data in each axe is in range [0,1]
+    # grades["grade"] = grades["grade"]  # Make data be in range [0,5]
+    grades["data_sum_diff_abs"] = 1 - grades["data_sum"].diff(periods=10).abs()
+    return grades
+
+
+def calc_grades_1(mean_normalized_data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calc diff of a row with n row ahead.
+
+    For small n: a high resolution diff will be calculated, noticing only aggressive changes in data.
+    For large n: a low resolution diff will be calculated, allowing the slope to be gentle, and yet be noticed.
+
+    This way, slow changes will be noticed
+    :param mean_normalized_data:
+    :return: pd.DataFrame
+    """
+
+    to_be_graded = mean_normalized_data.copy()
+
+    grades: pd.DataFrame = pd.DataFrame(columns=["time", "raw_diff_abs","derivative"])
+    grades["time"] = to_be_graded["elapsed"]
+
+    to_be_graded.iloc[:, :6] = to_be_graded.iloc[:, :6].diff(periods=10).abs()
+    grades["raw_diff_abs"] = 1 - to_be_graded.transpose().iloc[1:6,
+                                 :].sum()  # Max value is 1, from there it gett smaller as data diff grows
+    grades["derivative"] = grades["raw_diff_abs"].diff() / grades["time"].diff()
     return grades
 
 
@@ -324,9 +360,20 @@ if __name__ == "__main__":
                     df2_trace_title="mean_normalized",
                     given_title="IMU {} XYZ data, mean_normalized and std_removed_normalized. sliding_window size {} [sec]".format(
                         fig_sensor, window_size_sec))
-    grades = calc_grades(mean_normalized)
-    average_grade = grades["grade"].mean()
-    fig_grades(grades, "grades [average grade: {}]".format(average_grade), sensor_data=mean_normalized)
+
+    mean_normalized2 = mean_normalized.copy()
+    mean_normalized2.iloc[:, :6] = mean_normalized2.iloc[:, :6].diff(periods=10).abs()
+    fig_df1_and_df2(mean_normalized2, mean_normalized,
+                    sensor=fig_sensor,
+                    df1_trace_title="mean_normalized2",
+                    df2_trace_title="mean_normalized",
+                    given_title="IMU {} XYZ data, mean_normalized and std_removed_normalized.".format(
+                        fig_sensor))
+
+    grades = calc_grades_1(mean_normalized)
+    # average_grade = grades["data_sum"].mean()
+    avarage_grade = grades["raw_diff_abs"].mean()
+    fig_grades(grades, "grades [average grade: {}]".format(avarage_grade), sensor_data=mean_normalized)
     # fig_acc_xyz(std_removed_normalized, given_title="IMU std_removed_normalized data: acc XYZ")
     # fig_gyro_xyz(std_removed_normalized, given_title="IMU std_removed_normalized data: gyro XYZ")
     # fig_acc_xyz(mean_normalized, given_title="IMU data (sliding window mean normalized): acc XYZ")
