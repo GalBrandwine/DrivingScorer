@@ -34,6 +34,7 @@ class DrivingScorer:
 
         self._data_container: np.array([]) = np.zeros((1, 6))
         self._data_queue = deque(maxlen=self._MAXNUMBEROFSCORES)
+        self._preprocessed_data_queue = deque(maxlen=self._MAXNUMBEROFSCORES)
         self._input_ticks = 1000 / self._THREAD_INTERVAL_MS
         self._warm_up_time_passed = False
         self._first_10_seconds = 10
@@ -65,18 +66,15 @@ class DrivingScorer:
 
                 self._preprocess_data(data)
                 self._record_data(data, label)
-                # self._t_vec.append(time.time())  # capture timestamp
-                # self._t_vec = np.roll(self._t_vec, -1)  # Shift left by one.
-                # self._t_vec[
-                #     self._MAXNUMBEROFSCORES - 1] = time.time()
 
                 if self._input_ticks < 0:  # Happen every 1 second
                     self._input_ticks = 1000 / self._THREAD_INTERVAL_MS
 
-                    if self._warm_up_time_passed is True:
+                    if self._warm_up_time_passed:
+                        # Score the driving once a second.
                         self._score_drive()
                     else:
-                        if self._first_10_seconds >= 0:
+                        if self._first_10_seconds > 0:
                             print("Warming up.. %d sec left" % self._first_10_seconds)
                             self._first_10_seconds = self._first_10_seconds - 1
 
@@ -89,8 +87,6 @@ class DrivingScorer:
                             self._data_container = np.zeros((1, 6))  # Clean data container
                             self._warm_up_time_passed = True
 
-                    # print("RESETED")
-
             self._input_ticks = self._input_ticks - 1
             time.sleep(self._THREAD_INTERVAL_MS / 1000.0)
 
@@ -98,8 +94,10 @@ class DrivingScorer:
         self.logger.log_info("%f, %f, %f,%f, %f, %f, %s", data[0], data[1], data[2], data[3], data[4], data[5], label)
 
     def start(self, label) -> None:
+
         self._threaded_data_recorder = Thread(target=self._process_data, args=(label,))
         self._threaded_data_recorder.start()
+        print("Thread started")
 
     def stop(self) -> None:
         self._keep_running = False
@@ -125,68 +123,63 @@ class DrivingScorer:
         :param data: Updated sensor data.
         :return: None
         """
+        x = self._preprocessed_data_queue
+        step_size = 10
+        grade = np.zeros(int(self._MAXNUMBEROFSCORES / step_size))
+        for step in range(int(self._MAXNUMBEROFSCORES / step_size)):
+            grade[step] = (self._preprocessed_data_queue[step_size * step])
 
-        # self._raw_data = np.concatenate((self._raw_data, [data]), axis=0)
-        # distance_between_current_data_and_prev = np.linalg.norm(self._total_raw_data[-1] - data)
-        # print("distance_between_current_data_and_prev: ".format(distance_between_current_data_and_prev))
-        # self._total_raw_data = np.concatenate((self._total_raw_data, [data]), axis=0)
-        #
-        # # print(np.mean(self._total_raw_data,axis=0))
-        # # print((np.mean(np.mean(self._total_raw_data,axis=0))))
-        #
-        # # print((np.average(np.average(self._total_raw_data,axis=0))))
-        #
-        # self._raw_data = np.roll(self._raw_data, -1)  # Shift left by one.
-        # self._raw_data[
-        #     self._MAXNUMBEROFSCORES - 1] = data
-        #
-        # self._update_min_and_max(data)
-        # normalized_current_data = self._normalize_current_data(data)
-        #
-        # current_normalized_datascore_between_0_to_1 = self._get_norm_of_normalized_current_data(normalized_current_data)
-        # # print(current_normalized_datascore_between_0_to_1)
-        # self._update_scores_arr(current_normalized_datascore_between_0_to_1)
+        print("grading")
 
-    def _update_min_and_max(self, data):
-        temp_min = data.min()
-        temp_max = data.max()
-
-        self._maximum_data_point = temp_max if temp_max > self._maximum_data_point else self._maximum_data_point
-        self._minimum_data_point = temp_min if temp_min < self._minimum_data_point else self._minimum_data_point
-
-    def _normalize_current_data(self, data: np.array([])) -> np.array([]):
-        return (data - self._minimum_data_point) / (self._maximum_data_point - self._minimum_data_point)
-
-    def _get_norm_of_normalized_current_data(self, normalized_current_data: np.array([])) -> np.array([]):
+    def _normalize_current_data(self, distribution_shifted_data: deque) -> np.array([]):
         """
-        Normalize data to range between 0 and 1.
-        :param normalized_current_data:
-        :return: normal of current normalized data in the values between 0 to 1
+        Normalizing using: 
+        
+        norm = (data - data.min) / (data.max - data.min)
+        
+        :param distribution_shifted_data: 
+        :return: normalized_data
         """
-        normalized_current_data_between_0_to_1 = np.linalg.norm(
-            normalized_current_data - self._previous_normalized_sensor_data)
-        self._previous_normalized_sensor_data = normalized_current_data
+        normalized_data = np.zeros((self._MAXNUMBEROFSCORES, 6))
+        for i, data_sample in enumerate(distribution_shifted_data):
+            normalized_data[i] = data_sample
 
-        return normalized_current_data_between_0_to_1
+        normalized_data -= normalized_data.min()
+        normalized_data /= normalized_data.max()
 
-    def _update_scores_arr(self, current_normalized_datascore_between_0_to_1):
-        """
-        Add most updated normalized values to the end of the scores_arr,
-        while maintaining all previews data using a shift left method.
-        :param current_normalized_datascore_between_0_to_1: Updated and normalized scoring per current data sample.
-        :return: None
-        """
-        self._driving_scores_arr = np.roll(self._driving_scores_arr, -1)  # Shift left by one.
-        self._driving_scores_arr[
-            self._MAXNUMBEROFSCORES - 1] = 1 - current_normalized_datascore_between_0_to_1  # Add to the end.
-        self._update_current_score(current_normalized_datascore_between_0_to_1)
+        # print("normalizing data.")
+        return normalized_data
 
-    def _update_current_score(self, current_normalized_score) -> None:
-        self._current_driving_score = 1 - current_normalized_score
-        self._score_sum = self._score_sum + self._current_driving_score
-        self._number_of_scores = self._number_of_scores + 1
+    # def _get_norm_of_normalized_current_data(self, normalized_current_data: np.array([])) -> np.array([]):
+    #     """
+    #     Normalize data to range between 0 and 1.
+    #     :param normalized_current_data:
+    #     :return: normal of current normalized data in the values between 0 to 1
+    #     """
+    #     normalized_current_data_between_0_to_1 = np.linalg.norm(
+    #         normalized_current_data - self._previous_normalized_sensor_data)
+    #     self._previous_normalized_sensor_data = normalized_current_data
 
-        self._average_score = self._score_sum / self._number_of_scores
+        # return normalized_current_data_between_0_to_1
+
+    # def _update_scores_arr(self, current_normalized_datascore_between_0_to_1):
+    #     """
+    #     Add most updated normalized values to the end of the scores_arr,
+    #     while maintaining all previews data using a shift left method.
+    #     :param current_normalized_datascore_between_0_to_1: Updated and normalized scoring per current data sample.
+    #     :return: None
+    #     """
+    #     self._driving_scores_arr = np.roll(self._driving_scores_arr, -1)  # Shift left by one.
+    #     self._driving_scores_arr[
+    #         self._MAXNUMBEROFSCORES - 1] = 1 - current_normalized_datascore_between_0_to_1  # Add to the end.
+    #     self._update_current_score(current_normalized_datascore_between_0_to_1)
+
+    # def _update_current_score(self, current_normalized_score) -> None:
+    #     self._current_driving_score = 1 - current_normalized_score
+    #     self._score_sum = self._score_sum + self._current_driving_score
+    #     self._number_of_scores = self._number_of_scores + 1
+    #
+    #     self._average_score = self._score_sum / self._number_of_scores
 
     def _preprocess_data(self, data: np.array([])):
         """
@@ -196,9 +189,41 @@ class DrivingScorer:
         :param data: raw-data from sensor
         :return:
         """
+
+        # Shift data distribution to be 0-centered.
         denoised_data = data - self._std_dev
-        self._data_container = np.concatenate((self._data_container, denoised_data), axis=0)
-        # self._data_queue.append(data)
+
+        if self._first_10_seconds:
+            self._data_container = np.concatenate((self._data_container, denoised_data), axis=0)
+        else:
+            # Warm up time is over.
+            # Add shifted data to cyclic queue, that fills every 1 second.
+            self._data_queue.append(denoised_data)
+
+            # Step 1: Normalize Data
+            normalized_data_shifted_data = self._normalize_current_data(self._data_queue)
+
+            # Step 2: smooth normalized data, using mean on the queue,
+            # that performs as a sliding window in size of 1 second
+            mean_normalized_data_shifted_data = self._data_smoother(normalized_data_shifted_data)
+            print(mean_normalized_data_shifted_data)
+
+            # Step 3: Save the preprocessed data for later grading.
+            self._accumulate_mean(mean_normalized_data_shifted_data)
+
+    def _data_smoother(self, normalized_shifted_data: deque):
+        """
+        Smooth data using sliding window-mean.
+        :return: None
+        """
+        data_mean = np.zeros((self._MAXNUMBEROFSCORES, 6))
+        for i, data_sample in enumerate(normalized_shifted_data):
+            data_mean[i] = data_sample
+        # print("smoothing")
+        return data_mean.mean()
+
+    def _accumulate_mean(self, mean_normalized_data_shifted_data):
+        self._preprocessed_data_queue.append(mean_normalized_data_shifted_data)
 
 
 if __name__ == "__main__":

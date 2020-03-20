@@ -138,7 +138,7 @@ def calc_window_size(std_removed: pd.DataFrame, window_size_sec: float) -> int:
     return df[df['elapsed'] < window_size_sec].shape[0]
 
 
-def fig_normalize(un_normalized_data) -> pd.DataFrame:
+def normalize_data(un_normalized_data) -> pd.DataFrame:
     df = un_normalized_data.copy()
     df = df.iloc[:, 1:7]
     df -= df.min()  # equivalent to df = df - df.min()
@@ -161,10 +161,10 @@ def prepare_fig_df1_and_df2_gyro(df1, df2, df1_trace_title, df2_trace_title, giv
 
                         subplot_titles=("gX", "gY", "gZ"))
     # GX
-    fig.add_trace(
-        go.Scatter(x=df1['elapsed'], y=df1['gx'], name="gx {}".format(df1_trace_title)),
-        row=1, col=1
-    )
+    # fig.add_trace(
+    #     go.Scatter(x=df1['elapsed'], y=df1['gx'], name="gx {}".format(df1_trace_title)),
+    #     row=1, col=1
+    # )
 
     fig.add_trace(
         go.Scatter(x=df2['elapsed'], y=df2['gx'], name="gx {}".format(df2_trace_title)),
@@ -177,10 +177,10 @@ def prepare_fig_df1_and_df2_gyro(df1, df2, df1_trace_title, df2_trace_title, giv
         row=2, col=1
     )
 
-    fig.add_trace(
-        go.Scatter(x=df2['elapsed'], y=df2['ay'], name="ay {}".format(df2_trace_title)),
-        row=2, col=1
-    )
+    # fig.add_trace(
+    #     go.Scatter(x=df2['elapsed'], y=df2['ay'], name="ay {}".format(df2_trace_title)),
+    #     row=2, col=1
+    # )
 
     # GZ
     fig.add_trace(
@@ -188,10 +188,10 @@ def prepare_fig_df1_and_df2_gyro(df1, df2, df1_trace_title, df2_trace_title, giv
         row=3, col=1
     )
 
-    fig.add_trace(
-        go.Scatter(x=df2['elapsed'], y=df2['gz'], name="gz {}".format(df2_trace_title)),
-        row=3, col=1
-    )
+    # fig.add_trace(
+    #     go.Scatter(x=df2['elapsed'], y=df2['gz'], name="gz {}".format(df2_trace_title)),
+    #     row=3, col=1
+    # )
     return fig
 
 
@@ -351,7 +351,7 @@ if __name__ == "__main__":
     # fig_acc_xyz(mean, given_title="IMU data (sliding window mean): acc XYZ")
     # fig_gyro_xyz(mean, given_title="IMU data (sliding window mean): gyro XYZ")
 
-    std_removed_normalized = fig_normalize(std_removed)
+    std_removed_normalized = normalize_data(std_removed)
     mean_normalized = calc_mean_using_sliding_window(std_removed_normalized, window_size_sec)
     fig_sensor = "acc"
     fig_df1_and_df2(std_removed_normalized, mean_normalized,
