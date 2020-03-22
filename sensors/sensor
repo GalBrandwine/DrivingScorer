@@ -1,1 +1,69 @@
-<mxfile host="app.diagrams.net" modified="2020-03-22T11:05:52.106Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36" version="12.8.8" etag="Tr0xoXrmaLMf537RMwW2" type="github"><diagram id="Js-C5uWJV_8yMS-ku9lU">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2020-03-22T11:18:23.206Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36" etag="NUOIMG8Otas17coWOmgv" version="12.8.8" type="github">
+  <diagram id="Js-C5uWJV_8yMS-ku9lU" name="Page-1">
+    <mxGraphModel dx="1355" dy="774" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="OcsfjfqOpC2lLF62WLQ9-1" target="OcsfjfqOpC2lLF62WLQ9-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-4" value="If given" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="OcsfjfqOpC2lLF62WLQ9-3">
+          <mxGeometry x="-0.2" y="2" relative="1" as="geometry">
+            <mxPoint x="-9" y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="OcsfjfqOpC2lLF62WLQ9-1" target="OcsfjfqOpC2lLF62WLQ9-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-7" value="imu.get_data()" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=#ffffff;" vertex="1" connectable="0" parent="OcsfjfqOpC2lLF62WLQ9-6">
+          <mxGeometry x="-0.1611" y="4" relative="1" as="geometry">
+            <mxPoint x="-49" y="-91" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="OcsfjfqOpC2lLF62WLQ9-1" target="OcsfjfqOpC2lLF62WLQ9-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="425" y="420" />
+              <mxPoint x="610" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="OcsfjfqOpC2lLF62WLQ9-1" target="OcsfjfqOpC2lLF62WLQ9-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="425" y="420" />
+              <mxPoint x="240" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-1" value="imu sensor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="365" y="230" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-14" value="mock sensor reading" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="180" y="540" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="OcsfjfqOpC2lLF62WLQ9-10" target="OcsfjfqOpC2lLF62WLQ9-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-10" value="simulate reading from a record" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="560" y="540" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-12" value="Requires a record" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="720" y="540" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-5" value="read from real sensor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="365" y="540" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-2" value="specific sensor(mpu9250)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="170" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-8" value="Initiation requires a &lt;b&gt;usecase:&lt;br&gt;1 sensor&lt;br&gt;2 mock&lt;br&gt;3 simulator&lt;br&gt;&lt;/b&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="570" y="220" width="190" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="OcsfjfqOpC2lLF62WLQ9-16" value="Randomly generated" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="80" y="520" width="80" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
