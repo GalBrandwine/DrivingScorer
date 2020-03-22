@@ -23,7 +23,7 @@ class DrivingScorer:
 
     def __init__(self, logging_target: str, use_case="sensor"):
         self._THREAD_INTERVAL_MS = 20  # 50 hz
-        self._MAXNUMBEROFSCORES = 50  # fill queue with new data every 1 second
+        self._MAXNUMBEROFSCORES = 50  # Fill queue with new data every 1 second
 
         self._sensor = imu.Imu(use_case=use_case, sensor=mpu9250)
         self.logger = Logger(logging_target)
@@ -39,21 +39,18 @@ class DrivingScorer:
         self._warm_up_time_passed = False
         self._first_10_seconds = 10
         self._std_dev = np.zeros((1, 6))  # Std per axe
-
-        # self._t_vec = np.zeros((self._MAXNUMBEROFSCORES, 6))
-        # self._raw_data: np.array([]) = np.zeros(
-        #     (self._MAXNUMBEROFSCORES, 6))
-        # self._total_raw_data: np.array([]) = np.zeros((self._MAXNUMBEROFSCORES, 6))
-        #
-        # self._score_sum: float = 0
-        # self._average_score: float = 1.0
-        # self._number_of_scores: float = 1.0
-        # self._current_driving_score: float = 0
-        # self._previous_normalized_sensor_data: np.array([]) = np.random.uniform(-1, 1, 6)
-        # self._driving_scores_arr: np.array([]) = np.zeros(self._MAXNUMBEROFSCORES)
-        #
-        # self._maximum_data_point: float = 0
-        # self._minimum_data_point: float = 0
+        self._scoring_sampling_step = 10
+        self._average_score = 6
+        self._num_of_scores_so_far = 1
+        self._current_driving_score = 6.0  # Driver start with best score.
+        self._axis_weights = {
+            "AX": 0.35,  # Driving direction
+            "AY": 0.35,  # Cause for acceleration changes: Changing lanes aggressively
+            "AZ": 0.1,  # Cause for acceleration changes: Path-holes
+            "GX": 0.1,  # Cause for acceleration changes: One wheel Path-holes (or two wheels in the same side)
+            "GY": 0.1,  # Cause for acceleration changes: Driving into driving-slower bumper
+            "GZ": 0,  # Cause for acceleration changes: None?
+        }
 
     def _process_data(self, label):
         import time
@@ -107,29 +104,29 @@ class DrivingScorer:
         with self._data_lock:
             return self._current_driving_score, self._average_score
 
-    def get_raw_data(self) -> (np.array([]), list):
-        with self._data_lock:
-            t_vec = np.subtract(self._t_vec, self._t_vec[0])
-            return self._raw_data, t_vec
-
-    def get_score_arr(self) -> (np.array([]), list):
-        with self._data_lock:
-            t_vec = np.subtract(self._t_vec, self._t_vec[0])
-            return self._driving_scores_arr, t_vec
-
     def _score_drive(self) -> None:
         """
-        Naive way for scoring a drive.
+        Score data using weighted scoring method.
+
         :param data: Updated sensor data.
         :return: None
         """
-        x = self._preprocessed_data_queue
-        step_size = 10
-        grade = np.zeros(int(self._MAXNUMBEROFSCORES / step_size))
-        for step in range(int(self._MAXNUMBEROFSCORES / step_size)):
-            grade[step] = (self._preprocessed_data_queue[step_size * step])
+        grade = np.zeros((int(self._MAXNUMBEROFSCORES / self._scoring_sampling_step), 6))
+        for step in range(int(self._MAXNUMBEROFSCORES / self._scoring_sampling_step)):
+            grade[step] = (self._preprocessed_data_queue[self._scoring_sampling_step * step])
 
-        print("grading")
+        raw_grade_per_axe = grade.sum(axis=0)
+        weighted_grade = [raw_grade_per_axe[i] * self._axis_weights[key] for i, key in
+                          enumerate(self._axis_weights.keys())]
+        res_array = np.array(weighted_grade, dtype=np.float)
+
+        self._current_driving_score = 6 - res_array.sum()  # 6 meaning no acceleration changes at all.
+
+        # Update average scoring, using accomulating average approach:
+        #   avg(i) = (i - 1) / i * avg(i - 1) + x(i) / i; (i > 1)
+        self._average_score = (
+                                          self._num_of_scores_so_far - 1) / self._num_of_scores_so_far * self._average_score + self._current_driving_score / self._num_of_scores_so_far
+        self._num_of_scores_so_far = self._num_of_scores_so_far + 1
 
     def _normalize_current_data(self, distribution_shifted_data: deque) -> np.array([]):
         """
@@ -147,39 +144,7 @@ class DrivingScorer:
         normalized_data -= normalized_data.min()
         normalized_data /= normalized_data.max()
 
-        # print("normalizing data.")
         return normalized_data
-
-    # def _get_norm_of_normalized_current_data(self, normalized_current_data: np.array([])) -> np.array([]):
-    #     """
-    #     Normalize data to range between 0 and 1.
-    #     :param normalized_current_data:
-    #     :return: normal of current normalized data in the values between 0 to 1
-    #     """
-    #     normalized_current_data_between_0_to_1 = np.linalg.norm(
-    #         normalized_current_data - self._previous_normalized_sensor_data)
-    #     self._previous_normalized_sensor_data = normalized_current_data
-
-        # return normalized_current_data_between_0_to_1
-
-    # def _update_scores_arr(self, current_normalized_datascore_between_0_to_1):
-    #     """
-    #     Add most updated normalized values to the end of the scores_arr,
-    #     while maintaining all previews data using a shift left method.
-    #     :param current_normalized_datascore_between_0_to_1: Updated and normalized scoring per current data sample.
-    #     :return: None
-    #     """
-    #     self._driving_scores_arr = np.roll(self._driving_scores_arr, -1)  # Shift left by one.
-    #     self._driving_scores_arr[
-    #         self._MAXNUMBEROFSCORES - 1] = 1 - current_normalized_datascore_between_0_to_1  # Add to the end.
-    #     self._update_current_score(current_normalized_datascore_between_0_to_1)
-
-    # def _update_current_score(self, current_normalized_score) -> None:
-    #     self._current_driving_score = 1 - current_normalized_score
-    #     self._score_sum = self._score_sum + self._current_driving_score
-    #     self._number_of_scores = self._number_of_scores + 1
-    #
-    #     self._average_score = self._score_sum / self._number_of_scores
 
     def _preprocess_data(self, data: np.array([])):
         """
@@ -206,7 +171,6 @@ class DrivingScorer:
             # Step 2: smooth normalized data, using mean on the queue,
             # that performs as a sliding window in size of 1 second
             mean_normalized_data_shifted_data = self._data_smoother(normalized_data_shifted_data)
-            print(mean_normalized_data_shifted_data)
 
             # Step 3: Save the preprocessed data for later grading.
             self._accumulate_mean(mean_normalized_data_shifted_data)
@@ -219,11 +183,17 @@ class DrivingScorer:
         data_mean = np.zeros((self._MAXNUMBEROFSCORES, 6))
         for i, data_sample in enumerate(normalized_shifted_data):
             data_mean[i] = data_sample
-        # print("smoothing")
-        return data_mean.mean()
+
+        return data_mean.mean(axis=0)
 
     def _accumulate_mean(self, mean_normalized_data_shifted_data):
         self._preprocessed_data_queue.append(mean_normalized_data_shifted_data)
+
+    def set_average(self, user_average):
+        self._average_score = user_average
+
+    def get_warm_up_time_left(self):
+        return self._first_10_seconds
 
 
 if __name__ == "__main__":
@@ -236,9 +206,8 @@ if __name__ == "__main__":
 
     nump_of_scores = 1000
     while nump_of_scores > 0:
-        # data, t_vect = driving_scorer.get_raw_data()
-        # current_score = driving_scorer.get_scoring()
-        # print(current_score)
+        cur_score = driving_scorer.get_scoring()
+        print(cur_score)
         nump_of_scores = nump_of_scores - 1
 
         time.sleep(0.2)

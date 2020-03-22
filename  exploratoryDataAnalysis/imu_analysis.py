@@ -301,7 +301,7 @@ def calc_grades_1(mean_normalized_data: pd.DataFrame) -> pd.DataFrame:
 
     to_be_graded.iloc[:, :6] = to_be_graded.iloc[:, :6].diff(periods=10).abs()
     grades["raw_diff_abs"] = 1 - to_be_graded.transpose().iloc[1:6,
-                                 :].sum()  # Max value is 1, from there it gett smaller as data diff grows
+                                 :].sum()  # Max value is 1, from there it get smaller as data diff grows
     grades["derivative"] = grades["raw_diff_abs"].diff() / grades["time"].diff()
     return grades
 
