@@ -13,7 +13,7 @@ import driverScorer.driver_scoorer as drvr_scrr
 
 LOGTARGET = "CSV"
 # LOGTARGET = "CONSOLE"
-driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, use_case="simulator")
+driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, use_case="sensor")
 
 users_average_dict = {
     "gal": 6.0,

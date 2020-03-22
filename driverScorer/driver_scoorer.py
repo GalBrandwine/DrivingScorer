@@ -122,7 +122,7 @@ class DrivingScorer:
 
         self._current_driving_score = 6 - res_array.sum()  # 6 meaning no acceleration changes at all.
 
-        # Update average scoring, using accomulating average approach:
+        # Update average scoring, using accumulating average approach:
         #   avg(i) = (i - 1) / i * avg(i - 1) + x(i) / i; (i > 1)
         self._average_score = (
                                           self._num_of_scores_so_far - 1) / self._num_of_scores_so_far * self._average_score + self._current_driving_score / self._num_of_scores_so_far
