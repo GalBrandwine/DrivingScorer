@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2020-03-22T12:00:09.548Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36" etag="_RbbJC4enkRURYlPec0F" version="12.8.8" type="github" pages="5">
+<mxfile host="app.diagrams.net" modified="2020-03-22T12:08:52.190Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36" etag="A8X08neGrSTtNiZ0GtO3" version="12.8.8" type="github" pages="5">
   <diagram id="FabhQlQvctjSXVE3QbOY" name="DriverScorer_highLevel">
     <mxGraphModel dx="1355" dy="725" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -249,28 +249,30 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="CWIWDSEATRBwXlVc98E9-6" value="&lt;pre style=&quot;font-family: &amp;#34;dejavu sans mono&amp;#34; ; font-size: 15px&quot;&gt;&lt;font color=&quot;#ff00ff&quot;&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Sample from pre-processed data&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;pre&gt;Dont take all preprocessed data, &lt;/pre&gt;&lt;pre&gt;itll weaken important events.&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;glass=0;comic=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
-          <mxGeometry x="326.24" y="200" width="311.5" height="100" as="geometry" />
+          <mxGeometry x="326.24" y="170" width="311.5" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="CWIWDSEATRBwXlVc98E9-29" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;startFill=0;strokeColor=#D79B00;" edge="1" parent="CWIWDSEATRBwXlVc98E9-1" source="CWIWDSEATRBwXlVc98E9-8" target="CWIWDSEATRBwXlVc98E9-28">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="CWIWDSEATRBwXlVc98E9-29" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;startFill=0;strokeColor=#D79B00;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="CWIWDSEATRBwXlVc98E9-1" source="CWIWDSEATRBwXlVc98E9-8" target="CWIWDSEATRBwXlVc98E9-24">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="482" y="500" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="CWIWDSEATRBwXlVc98E9-8" value="&lt;pre&gt;&lt;pre&gt;&lt;pre style=&quot;font-family: &amp;#34;dejavu sans mono&amp;#34; ; font-size: 15px&quot;&gt;&lt;font color=&quot;#ff00ff&quot;&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Sum sampeled per axe&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;pre&gt;Resulting with an array with dim = 6&lt;/pre&gt;&lt;/pre&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;glass=0;comic=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
           <mxGeometry x="331.25" y="370" width="301.49" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="CWIWDSEATRBwXlVc98E9-30" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;startFill=0;strokeColor=#D79B00;" edge="1" parent="CWIWDSEATRBwXlVc98E9-1" source="CWIWDSEATRBwXlVc98E9-28" target="CWIWDSEATRBwXlVc98E9-24">
+        <mxCell id="CWIWDSEATRBwXlVc98E9-32" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;startFill=0;strokeColor=#D79B00;" edge="1" parent="CWIWDSEATRBwXlVc98E9-1" source="CWIWDSEATRBwXlVc98E9-24" target="CWIWDSEATRBwXlVc98E9-31">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="CWIWDSEATRBwXlVc98E9-28" value="&lt;pre&gt;&lt;pre&gt;&lt;pre style=&quot;font-family: &amp;#34;dejavu sans mono&amp;#34; ; font-size: 15px&quot;&gt;&lt;font color=&quot;#ff00ff&quot;&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Calculate current grade&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;pre&gt;Sum the weighted-grade array, resulting with 1 scalar.&lt;/pre&gt;&lt;/pre&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;glass=0;comic=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
-          <mxGeometry x="272.64" y="500" width="418.74" height="60" as="geometry" />
+        <mxCell id="CWIWDSEATRBwXlVc98E9-24" value="&lt;pre&gt;&lt;pre&gt;&lt;pre style=&quot;font-family: &amp;#34;dejavu sans mono&amp;#34; ; font-size: 15px&quot;&gt;&lt;font color=&quot;#ff00ff&quot;&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Calculate weighted grade per axe&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;pre&gt;Not all axes effect equally on the passenger &lt;/pre&gt;&lt;/pre&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;glass=0;comic=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
+          <mxGeometry x="312.62" y="520" width="338.75" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="CWIWDSEATRBwXlVc98E9-27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;startFill=0;strokeColor=#D79B00;" edge="1" parent="CWIWDSEATRBwXlVc98E9-1" source="CWIWDSEATRBwXlVc98E9-24" target="CWIWDSEATRBwXlVc98E9-26">
+        <mxCell id="CWIWDSEATRBwXlVc98E9-33" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=none;startFill=0;strokeColor=#D79B00;" edge="1" parent="CWIWDSEATRBwXlVc98E9-1" source="CWIWDSEATRBwXlVc98E9-31" target="CWIWDSEATRBwXlVc98E9-26">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="CWIWDSEATRBwXlVc98E9-24" value="&lt;pre&gt;&lt;pre&gt;&lt;pre style=&quot;font-family: &amp;#34;dejavu sans mono&amp;#34; ; font-size: 15px&quot;&gt;&lt;font color=&quot;#ff00ff&quot;&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Calculate weighted grade&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;pre&gt;Not all axe effect equally on the passenger &lt;/pre&gt;&lt;/pre&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;glass=0;comic=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
-          <mxGeometry x="312.63" y="630" width="338.75" height="60" as="geometry" />
+        <mxCell id="CWIWDSEATRBwXlVc98E9-31" value="&lt;pre&gt;&lt;pre&gt;&lt;pre style=&quot;font-size: 15px ; font-family: &amp;#34;dejavu sans mono&amp;#34;&quot;&gt;&lt;font color=&quot;#ff00ff&quot;&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Calculate final grade&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;pre&gt;Sum weighted grades&lt;/pre&gt;&lt;/pre&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;glass=0;comic=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
+          <mxGeometry x="312.61" y="670" width="338.75" height="60" as="geometry" />
         </mxCell>
         <mxCell id="CWIWDSEATRBwXlVc98E9-26" value="&lt;pre&gt;&lt;pre&gt;&lt;pre style=&quot;font-family: &amp;#34;dejavu sans mono&amp;#34; ; font-size: 15px&quot;&gt;&lt;font color=&quot;#ff00ff&quot;&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;Updated average grade.&lt;/span&gt;&lt;/font&gt;&lt;/pre&gt;&lt;/pre&gt;&lt;/pre&gt;" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;glass=0;comic=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
-          <mxGeometry x="312.61" y="770" width="338.75" height="60" as="geometry" />
+          <mxGeometry x="312.61" y="820" width="338.75" height="60" as="geometry" />
         </mxCell>
         <mxCell id="CWIWDSEATRBwXlVc98E9-23" value="&lt;pre style=&quot;color: rgb(169 , 183 , 198) ; font-family: &amp;#34;dejavu sans mono&amp;#34; ; font-size: 11.3pt&quot;&gt;&lt;span style=&quot;color: rgb(98 , 151 , 85) ; font-style: italic ; background-color: rgb(255 , 255 , 255)&quot;&gt;Score data using weighted scoring method.&lt;/span&gt;&lt;/pre&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;" vertex="1" parent="CWIWDSEATRBwXlVc98E9-1">
           <mxGeometry x="20" y="50" width="390" height="50" as="geometry" />
