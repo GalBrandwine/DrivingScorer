@@ -120,7 +120,7 @@ class DrivingScorer:
                           enumerate(self._axis_weights.keys())]
         res_array = np.array(weighted_grade, dtype=np.float)
 
-        self._current_driving_score = 6 - res_array.sum()  # 6 meaning no acceleration changes at all.
+        self._current_driving_score = res_array.sum()  # 6 meaning no acceleration changes at all.
 
         # Update average scoring, using accumulating average approach:
         #   avg(i) = (i - 1) / i * avg(i - 1) + x(i) / i; (i > 1)
