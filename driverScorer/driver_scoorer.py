@@ -100,9 +100,9 @@ class DrivingScorer:
         self._keep_running = False
         self._threaded_data_recorder.join()
 
-    def get_scoring(self) -> (float, float):
+    def get_scoring(self) -> (float, (float, float)):
         with self._data_lock:
-            return self._current_driving_score, self._average_score
+            return self._current_driving_score, [self._average_score, self._num_of_scores_so_far]
 
     def _score_drive(self) -> None:
         """
@@ -125,7 +125,7 @@ class DrivingScorer:
         # Update average scoring, using accumulating average approach:
         #   avg(i) = (i - 1) / i * avg(i - 1) + x(i) / i; (i > 1)
         self._average_score = (
-                                          self._num_of_scores_so_far - 1) / self._num_of_scores_so_far * self._average_score + self._current_driving_score / self._num_of_scores_so_far
+                                      self._num_of_scores_so_far - 1) / self._num_of_scores_so_far * self._average_score + self._current_driving_score / self._num_of_scores_so_far
         self._num_of_scores_so_far = self._num_of_scores_so_far + 1
 
     def _normalize_current_data(self, distribution_shifted_data: deque) -> np.array([]):
@@ -189,8 +189,9 @@ class DrivingScorer:
     def _accumulate_mean(self, mean_normalized_data_shifted_data):
         self._preprocessed_data_queue.append(mean_normalized_data_shifted_data)
 
-    def set_average(self, user_average):
-        self._average_score = user_average
+    def set_average_and_samples_num(self, user_average):
+        self._average_score = user_average[0]
+        self._num_of_scores_so_far = user_average[1]
 
     def get_warm_up_time_left(self):
         return self._first_10_seconds
