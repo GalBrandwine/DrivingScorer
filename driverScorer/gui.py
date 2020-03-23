@@ -20,7 +20,7 @@ def start_recording(label: str):
     driver_scorer.start(label)
 
 
-def store_user_average_and_samples_num(label: str, current_average_and_samples: [float,float], users_average_dict_input: dict):
+def store_user_average_and_samples_num(users_average_dict_input: dict):
     """
     Store user average to disk.
     :param label:
@@ -29,19 +29,17 @@ def store_user_average_and_samples_num(label: str, current_average_and_samples: 
     :return:
     """
 
-    users_average_dict_input[label] = current_average_and_samples
     pickle.dump(users_average_dict_input, open("users_average.p", "wb"))
 
 
-def set_average_and_samples_num(label: str, users_average_dict_input: dict):
+def set_average_and_samples_num(user_accomulating_average_and_scores_num: dict):
     """
     Get average for this user
-    :param label:
-    :param users_average_dict_input:
+    :param user_accomulating_average_and_scores_num:
     :return:
     """
 
-    driver_scorer.set_average_and_samples_num(users_average_dict_input[label])
+    driver_scorer.set_average_and_samples_num(user_accomulating_average_and_scores_num)
 
 
 # GUI section
@@ -72,7 +70,8 @@ def handle_start_recording(label, users_average_dict_input):
     # window.Finalize()  # needed to access the canvas element prior to reading the window
 
     user_name = label
-    set_average_and_samples_num(user_name, users_average_dict_input)
+
+    set_average_and_samples_num(users_average_dict_input[user_name])
     start_recording(user_name)  # Start driving_scorer
 
     average_score = 6
@@ -87,9 +86,10 @@ def handle_start_recording(label, users_average_dict_input):
             current_score, average_score_and_samples = driver_scorer.get_scoring()
             window['-CURRENT_SCORE-'].update(current_score)
             window['-AVERAGE_SCORE-'].update(average_score_and_samples[0])
+            users_average_dict_input[user_name] = average_score_and_samples
 
         if label == 'Exit' or label == 'Done' or label is None:
-            store_user_average_and_samples_num(user_name, average_score_and_samples, users_average_dict_input)
+            store_user_average_and_samples_num(users_average_dict_input)
             return
 
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         print(users_average_dict)
     except FileNotFoundError as err:
         # Create and save
-        users_average_dict = {  # Initials: [average, num_of_samples]
+        users_average_dict = {  # Key: driver_name  , Value: [average, num_of_samples]
             "gal": [6.0, 1],
             "rivka": [6.0, 1],
             "other": [6.0, 1]
