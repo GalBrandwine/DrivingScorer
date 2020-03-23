@@ -13,7 +13,7 @@ import driverScorer.driver_scoorer as drvr_scrr
 
 LOGTARGET = "CSV"
 # LOGTARGET = "CONSOLE"
-driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, use_case="sensor")
+driver_scorer = drvr_scrr.DrivingScorer(LOGTARGET, use_case="simulator")
 
 users_average_dict = {
     "gal": 6.0,
@@ -100,18 +100,18 @@ def handle_start_recording(label):
     set_average(user_name)
     start_recording(user_name)  # Start driving_scorer
 
+    average_score = 6
     while True:
         label, values = window.read(timeout=1)
 
         warm_up_time_left = driver_scorer.get_warm_up_time_left()
         if warm_up_time_left > 0:
-            current_score = "init {}".format(warm_up_time_left)
-            average_score = "init {}".format(warm_up_time_left)
+            window['-CURRENT_SCORE-'].update("init {}".format(warm_up_time_left))
+            window['-AVERAGE_SCORE-'].update("init {}".format(warm_up_time_left))
         else:
             current_score, average_score = driver_scorer.get_scoring()
-
-        window['-CURRENT_SCORE-'].update(current_score)
-        window['-AVERAGE_SCORE-'].update(average_score)
+            window['-CURRENT_SCORE-'].update(current_score)
+            window['-AVERAGE_SCORE-'].update(average_score)
 
         if label == 'Exit' or label == 'Done' or label is None:
             store_user_average(user_name, average_score)

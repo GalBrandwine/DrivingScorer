@@ -20,7 +20,7 @@ class Imu:
             self._num_of_rows = self._df.shape[0]
             self._current_row = 0
         else:
-            message = "NO SUCH IMU USECASE"
+            message = "NO SUCH IMU USECASE. Possible usecases: sensor,simulator,mock"
             raise Exception(message)
 
         self._data: np.array([]) = np.array([])
