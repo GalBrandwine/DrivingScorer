@@ -12,13 +12,12 @@ class Logger:
 
         if logging_target == "CONSOLE":
 
-            # create console handler with a higher log level
-            ch = logging.StreamHandler()
+            ch = logging.StreamHandler()  # Create console handler with a higher log level
             ch.setLevel(logging.INFO)
-            # create formatter and add it to the handlers
-            ch.setFormatter(formatter)
-            # add the handlers to logger
-            self.logger.addHandler(ch)
+
+            ch.setFormatter(formatter)  # Create formatter and add it to the handlers
+
+            self.logger.addHandler(ch)  # Add the handlers to logger
 
         elif logging_target == "CSV":
 
@@ -26,9 +25,9 @@ class Logger:
             cwd = os.getcwd()
             cwd = os.path.split(cwd)[0] + "/Data/"
             filename = cwd + "/" + today.strftime("%d_%m_%Y_%H_%M_%S") + ".csv"
+            print("Record file: %s" % filename)
 
-            # create file handler which logs even debug messages
-            fh = logging.FileHandler(filename)
+            fh = logging.FileHandler(filename)  # Create file handler which logs even debug messages
             fh.setLevel(logging.INFO)
             fh.setFormatter(formatter)
             self.logger.addHandler(fh)
